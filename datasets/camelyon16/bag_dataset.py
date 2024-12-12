@@ -180,7 +180,6 @@ def compute_feats(
         patch_labels_dict: dict = None, 
         csv_directory: str = None
 ): 
-    print('embedder:', embedder)
     num_bags = len(bags_list)
     
     for i in tqdm(range(num_bags)):
