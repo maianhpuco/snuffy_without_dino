@@ -354,12 +354,13 @@ if __name__ == '__main__':
     args.background_t = args.background_t or config['BACKGROUND_T']
     args.dataset = args.dataset or config['DATASET']
     args.format = args.format or config['FORMAT']
-    args.slides_dir = args.slides_dir or config['SLIDES_DIR']
-    args.output_dir = args.output_dir or config['OUTPUT_DIR']
-    args.tile_label_csv = args.tile_label_csv or config['TILE_LABEL_CSV'] 
-    args.wsi_temp_folder = args.args_temp_folder or config['WSI_TEMP_FOLDER']
     
+    args.slides_dir = config['SLIDES_DIR']
+    args.output_dir = config['OUTPUT_DIR']
+    args.tile_label_csv = config['TILE_LABEL_CSV'] 
+    args.wsi_temp_folder = config['WSI_TEMP_FOLDER']
     levels = [config['LEVELS']]
+    
     print("image_dir: ", args.slides_dir)
     out_base = os.path.join(args.output_dir, 'single')
     all_slides = glob.glob(os.path.join(args.slides_dir, '0_normal/*.' + args.slide_format)) + \
