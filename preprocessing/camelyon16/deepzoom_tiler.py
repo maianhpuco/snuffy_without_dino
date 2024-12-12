@@ -378,7 +378,7 @@ if __name__ == '__main__':
             df['test'].dropna().to_list()
         )
         all_slide_names = [f"{bn}.{args.format}" for bn in all_basenames if bn.split("_") in ['normal', 'tumor', 'test']]
-        all_slides = [glob.glob(os.path.join(args.slides_dir, i))[0] for i in all_slide_name]
+        all_slides = [glob.glob(os.path.join(args.slides_dir, i))[0] for i in all_slide_names]
     else: 
         print("RUNING ON FULL DATASET")
         all_slides = glob.glob(os.path.join(args.slides_dir, '*.' + args.slide_format)) 
