@@ -268,7 +268,7 @@ if __name__ == "__main__":
         print(f"Directory {feats_path} already existed and has been removed.")
     os.mkdir(feats_path)
        
-    bags_list = glob.glob(os.path.join(bags_path_normal, '/*')) + glob.glob(os.path.join(bags_path_tumor,'/*'))  
+    bags_list = glob.glob(os.path.join(bags_path_normal, '*')) + glob.glob(os.path.join(bags_path_tumor,'*'))  
     
     print(bags_list)
      
