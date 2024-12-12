@@ -381,7 +381,7 @@ if __name__ == '__main__':
             df['val'].dropna().to_list() +
             df['test'].dropna().to_list()
         )
-        all_slide_names = [f"{bn}.{args.format}" for bn in all_basenames if bn.split("_"[0] in ['normal', 'tumor', 'test']]
+        all_slide_names = [f"{bn}.{args.format}" for bn in all_basenames if bn.split("_")[0] in ['normal', 'tumor', 'test']]
         print(all_slide_names) 
         all_slides = [glob.glob(os.path.join(args.slides_dir, i))[0] for i in all_slide_names]
         print(all_slides)
