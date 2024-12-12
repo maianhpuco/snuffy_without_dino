@@ -229,7 +229,8 @@ def learning_feats(
             os.makedirs(csv_directory, exist_ok=True)
             df_save_path = os.path.join(csv_file + '.csv')
             df.to_csv(df_save_path, index=False, float_format='%.4f')
-        print(f"Take {time.time()-start_time} to process 1 batch") 
+        
+        print(f"Take {time.time()-start_time} to process 1 bags") 
         
 def load_config(config_file):
     with open(config_file, 'r') as file:
@@ -244,7 +245,7 @@ if __name__ == "__main__":
      
     args = parser.parse_args()
     args.slides_dir = config['SLIDES_DIR'] 
-    args.slides_dir = config['SLIDES_DIR']
+    args.sampling_csv = config['SAMPLING_CSV']
     args.tile_label_csv = config['TILE_LABEL_CSV'] 
     args.batch_size = 32 
     args.transform = 1 
@@ -267,10 +268,20 @@ if __name__ == "__main__":
         shutil.rmtree(feats_path)
         print(f"Directory {feats_path} already existed and has been removed.")
     os.mkdir(feats_path)
-       
-    bags_list = glob.glob(os.path.join(bags_path_normal, '*')) + glob.glob(os.path.join(bags_path_tumor,'*'))  
-    bags_list = bags_list[:2] 
-    # print(bags_list)
+    train_val_test = 'train': 
+        
+    split_df = pd.read_csv(args.sampling_csv)
+    train_bags_list = split_df[train_val_test].dropna().tolist()  
+    
+    
+    available_bags_list = glob.glob(os.path.join(bags_path_normal, '*')) + glob.glob(os.path.join(bags_path_tumor,'*')) 
+    available_bags_base_names = [os.path.basename(bag) for bag in available_bags_list]
+ 
+    filtered_bags_list = [bag for bag, base_name in zip(available_bags_list, available_bags_base_names) 
+                    if base_name in train_bags_list]
+    
+    bags_list = filtered_bags_list
+    print(bags_list)
      
     print(f'>>>> Number of bags: {len(bags_list)} | Sample Bag: {bags_list[0]}')
 

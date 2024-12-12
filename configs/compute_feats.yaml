@@ -9,3 +9,4 @@ SAMPLING_CSV: ./datasets/camelyon16/sample_20.csv
 FEATURE_OUTPUT: None 
 SLIDES_DIR: /project/hnguyen2/hqvo3/Datasets/digital_pathology/public/CAMELYON16/images 
 TILE_LABEL_CSV: /project/hnguyen2/mvu9/camelyon16/tile_label.csv 
+SAMPLING_CSV: ./datasets/camelyon16/sample_20.csv
