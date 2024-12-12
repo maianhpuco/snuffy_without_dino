@@ -216,7 +216,7 @@ class MILNet(nn.Module):
     
 class VITFeatureExtractor(nn.Module):
     def __init__(self, base_model='vit_base_patch16_224', out_dim=768, pretrained=True):
-        super(ViTSimCLR, self).__init__()
+        super(VITFeatureExtractor, self).__init__()
         self.model = timm.create_model(base_model, pretrained=True, num_classes=0)
         
         num_ftrs = self.model.embed_dim 
