@@ -431,7 +431,6 @@ if __name__ == '__main__':
         nested_patches(
             img_slide=c_slide, 
             out_base=out_base, 
-            levels=levels, 
             wsi_temp_folder=args.wsi_temp_folder, 
             ext=args.format)
         print(f"- Done nested after {(time.time()-start_time)/60.0} mins") 
