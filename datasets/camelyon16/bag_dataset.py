@@ -279,7 +279,7 @@ if __name__ == "__main__":
     args.transform = 1 
     args.backbone = 'vitbasetimm' 
     args.num_workers = 1  
-    gpu_index = 0 
+    args.gpu_index = 0 
      
     gpu_ids = tuple(args.gpu_index)
     
