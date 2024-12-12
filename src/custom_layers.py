@@ -204,12 +204,14 @@ class PositionwiseFeedForward(nn.Module):  # mikham
 
 
 class MILNet(nn.Module):
-    def __init__(self, i_classifier, b_classifier):
+    def __init__(self, feature_extractor, i_classifier, b_classifier):
         super(MILNet, self).__init__()
+        self.feature_extractor = feature_extractor
         self.i_classifier = i_classifier
         self.b_classifier = b_classifier
 
     def forward(self, x):
+        x = feature_extractor(x)
         feats, classes = self.i_classifier(x)
         prediction_bag, A = self.b_classifier(feats, classes)
 
@@ -222,7 +224,6 @@ class VITFeatureExtractor(nn.Module):
         self.model = timm.create_model(base_model, pretrained=True, num_classes=0)
         
         num_ftrs = self.model.embed_dim 
-        print("num_fts", num_ftrs)
         
         # Projection MLP
         self.l1 = nn.Linear(num_ftrs, num_ftrs)
@@ -233,42 +234,25 @@ class VITFeatureExtractor(nn.Module):
     def forward(self, x):
         # Extract features using the forward_features method of the ViT model
         fts = self.model.forward_features(x)  # Returns feature embeddings
-        print(fts.shape)
+        # print(fts.shape)
         h = fts[:, 0, :] #extracts the [CLS] token's feature vector from the output of the ViT model for each image in the batch. 
         # h = h.squeeze()  # Ensure no unnecessary dimensions
-        print(h.shape)
+        # print(h.shape)
         # Apply projection head
         x = self.l1(h)
         x = F.relu(x)
         x = self.l2(x)
-        return h, x  # cls token, feature embedding 
+        return x  # cls token, feature embedding 
 
-# class ViTFeatureExtractor(nn.Module):
-#     def __init__(self, model_name='vit_base_patch16_224', pretrained=True, output_dim=None):
-#         super(ViTFeatureExtractor, self).__init__()
-
-#         # Load the ViT model from timm (with no classification head)
-#         self.vit_backbone = timm.create_model(model_name, pretrained=pretrained, num_classes=0)
-
-#         # Set output dimension (ViT Base has an output size of 768 for its feature vector)
-#         self.output_dim = output_dim or self.model.embed_dim 
-#         self.
-#     def forward(self, x):
-#         # Extract features using the ViT backbone
-#         features = self.vit_backbone(x)
-
-#         # The output will be of shape (batch_size, output_dim) after feature extraction
-#         return features
     
     
-    
-if __name__=='__main__':
-    input_tensor = torch.randn(8, 3, 224, 224)  # Example with a batch size of 8
+# if __name__=='__main__':
+#     input_tensor = torch.randn(8, 3, 224, 224)  # Example with a batch size of 8
 
-    # Create the ViT feature extractor
-    vit_extractor = VITFeatureExtractor()
+#     # Create the ViT feature extractor
+#     vit_extractor = VITFeatureExtractor()
 
-    # Get the feature vector from the input tensor
-    cls_token, features = vit_extractor(input_tensor)
+#     # Get the feature vector from the input tensor
+#     features = vit_extractor(input_tensor)
 
-    print("Feature shape:", cls_token.shape, features.shape)  
+#     print("Feature shape:", features.shape)  

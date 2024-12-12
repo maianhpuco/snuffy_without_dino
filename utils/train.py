@@ -112,11 +112,14 @@ class Trainer:
 
     def _load_init_weights(self):
         try:
+            # weight_init_i_part = WEIGHT_INITS[self.args.weight_init__weight_init_i__weight_init_b[1]] 
             weight_init_i_part = WEIGHT_INITS[self.args.weight_init__weight_init_i__weight_init_b[1]]
             weight_init_b_part = WEIGHT_INITS[self.args.weight_init__weight_init_i__weight_init_b[2]]
+            # print(f'\n\nweight_init_i_part: {weight_init_f_part}') 
             print(f'\n\nweight_init_i_part: {weight_init_i_part}')
             print(f'weight_init_b_part: {weight_init_b_part}\n\n')
             # ------------------------------
+            # self.milnet.feature_extractor.apply(weight_init_f_part)
             self.milnet.i_classifier.apply(weight_init_i_part)
             self.milnet.b_classifier.apply(weight_init_b_part)
             # ------------------------------
@@ -141,7 +144,9 @@ class Trainer:
         else:
             data = shuffle(data[0], data[1])
             data = data[0], data[1], None, None
+            
         all_labels, all_feats, all_feats_labels, all_positions = data
+        
         num_bags = len(all_labels)
 
         if device == 'cpu':

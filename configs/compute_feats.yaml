@@ -1,0 +1,11 @@
+NUM_CLASSES: 0
+NUM_FEATS: 768
+BATCH_SIZE: 128
+NUM_WORKERS: 0
+DATASET: 
+BACKBONE: resnet18
+SAVE_WEIGHTS: None
+SAMPLING_CSV: ./datasets/camelyon16/sample_20.csv 
+FEATURE_OUTPUT: None 
+SLIDES_DIR: /project/hnguyen2/hqvo3/Datasets/digital_pathology/public/CAMELYON16/images 
+TILE_LABEL_CSV: /project/hnguyen2/mvu9/camelyon16/tile_label.csv 
