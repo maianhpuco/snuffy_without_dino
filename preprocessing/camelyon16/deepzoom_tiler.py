@@ -337,8 +337,8 @@ if __name__ == '__main__':
         '-t', '--background_t', type=int, default=20,
         help='Threshold for filtering background [15]'  # Changed to 20
     )
-    parser.add_argument("-d", "--tile_label_csv", type=str)
-    parser.add_argument("-d", "--wsi_temp_folder", type=str)
+    parser.add_argument("--tile_label_csv", type=str)
+    parser.add_argument("--wsi_temp_folder", type=str)
     
     args = parser.parse_args()
 
