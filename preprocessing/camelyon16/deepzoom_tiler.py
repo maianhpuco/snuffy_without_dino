@@ -382,15 +382,13 @@ if __name__ == '__main__':
             df['test'].dropna().to_list()
         )
         all_slide_names = [f"{bn}.{args.slide_format}" for bn in all_basenames if bn.split("_")[0] in ['normal', 'tumor', 'test']]
-        print(all_slide_names) 
         all_slides = [glob.glob(os.path.join(args.slides_dir, i))[0] for i in all_slide_names]
-        print(all_slides)
     else: 
         print("RUNING ON FULL DATASET")
         all_slides = glob.glob(os.path.join(args.slides_dir, '*.' + args.slide_format)) 
         
-    print("all_slides:", all_slides) 
-    
+    print("Number of slide to process:", len(all_slides))
+
     # pos-i_pos-j -> x, y
     tile_label_csv = open(args.tile_label_csv, "a")
     tile_label_csv.write('slide_name,label\n')
@@ -412,7 +410,7 @@ if __name__ == '__main__':
             mag_levels=levels,
             base_mag=args.base_mag,
             objective=args.objective,
-            format=argsformat ,
+            format=args.format ,
             tile_size=args.tile_size, #256,
             overlap=args.overlap,
             limit_bounds=True,
