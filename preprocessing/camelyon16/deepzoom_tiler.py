@@ -369,8 +369,8 @@ if __name__ == '__main__':
     print("image_dir: ", args.slides_dir)
     out_base = os.path.join(args.output_dir, 'single')
     if args.sampling == 1:
-        samling_csv_filepath = config['SAMPLING_CSV']
-        print(f"RUNNING ON SAMPLING DATGASET, CSV IS AT {samling_csv_filepath}")
+        sampling_csv_filepath = config['SAMPLING_CSV']
+        print(f"RUNNING ON SAMPLING DATGASET, CSV IS AT {sampling_csv_filepath}")
         df = pd.read_csv(sampling_csv_filepath)
         all_basenames = (
             df['train'].dropna().to_list() +
