@@ -378,7 +378,7 @@ if __name__ == '__main__':
     os.mkdir(temp_dir)
     if os.path.exists(temp_dir):
         print(f"Directory {temp_dir} created")
-
+    print("all_slides:", all_slides)
     for idx, c_slide in enumerate(all_slides):
         print('Process slide {}/{} : {}'.format(idx + 1, len(all_slides), c_slide))
         tiler = DeepZoomStaticTiler(
