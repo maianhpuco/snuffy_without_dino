@@ -158,8 +158,10 @@ def bag_dataset(args, patches: List[str] = None, patch_labels_dict: dict = None)
 def get_patch_labels_dict(patch_labels_path) -> Optional[Dict[str, int]]:
     try:
         labels_df = pd.read_csv(patch_labels_path)
+        ignore_values = ['slide_name', 'label']
+        labels_df = labels_df[~labels_df.isin(ignore_values).any(axis=1)]
         print("- content of tile_label: ")
-        print(labels_df.head(3))
+        print(labels_df.head(10))
         print(f'Using patch_labels csv file at {patch_labels_path}')
         duplicates = labels_df['slide_name'].duplicated()
         assert not any(duplicates), "There are duplicate patch_names in the {patch_labels_csv} file."
