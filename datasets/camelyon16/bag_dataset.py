@@ -153,32 +153,21 @@ def bag_dataset(args, patches: List[str] = None, patch_labels_dict: dict = None)
             - dataloader (torch.utils.data.DataLoader): The data loader to access the bag dataset in batches.
             - dataset_size (int): The total number of bags (patches) in the dataset.
     """
-    if args.backbone in specified_archs:
-        if args.transform == 1:
-            transforms = [Resize(224), ToTensor(), NormalizeImage((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))]
-        else:
-            transforms = [Resize(224), ToTensor()]
-        transformed_dataset = BagDataset(
-            files_list=patches,
-            transform=Compose(transforms),
-            patch_labels_dict=patch_labels_dict
-        )
+
+    if args.transform == 1:
+        transforms = [
+            Resize(224), 
+            ToTensor(), 
+            NormalizeImage((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
+            ]
     else:
-        transforms = [ToTensor()]
-        if args.backbone == 'vitbasetimm':
-            if args.transform == 1:
-                transforms = [
-                    Resize(224), 
-                    ToTensor(), 
-                    NormalizeImage((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
-                    ]
-            else:
-                transforms = [Resize(224), ToTensor()]
-        transformed_dataset = BagDataset(
-            files_list=patches,
-            transform=Compose(transforms),
-            patch_labels_dict=patch_labels_dict
-        )
+        transforms = [Resize(224), ToTensor()]
+        
+    transformed_dataset = BagDataset(
+        files_list=patches,
+        transform=Compose(transforms),
+        patch_labels_dict=patch_labels_dict
+            
     dataloader = DataLoader(
         transformed_dataset, 
         batch_size=args.batch_size, 
