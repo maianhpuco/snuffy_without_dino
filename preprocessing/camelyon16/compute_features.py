@@ -1,49 +1,121 @@
+from dataset.camelyon
 specified_archs = [
     'vit_small', 'vit_base',
     'mae_vit_base_patch16', 'mae_vit_large_patch16'
 ] 
 
+def compute_feats(
+        args,
+        bags_list: List[str],
+        embedder: nn.Module,
+        save_path: str,
+        patch_labels_dict: dict = None
+):
+    print('embedder:', embedder)
+    num_bags = len(bags_list)
+    for i in tqdm(range(num_bags)):
+        patches = glob.glob(os.path.join(bags_list[i], '*.jpg')) + \
+                  glob.glob(os.path.join(bags_list[i], '*.jpeg'))
 
-def bag_dataset(args, patches: List[str], patch_labels_dict: dict = None) -> Tuple[DataLoader, int]:
-    """
-    Create a bag dataset and its corresponding data loader.
+        dataloader, bag_size = bag_dataset(args, patches, patch_labels_dict)
 
-    This function creates a bag dataset from the provided list of patch file paths and prepares a data loader to access
-    the data in batches. The bag dataset is expected to contain bag-level data, where each bag is represented as a
-    collection of instances.
+        feats_list = []
+        feats_labels = []
+        feats_positions = []
+        embedder.eval()
+        with torch.no_grad():
+            for iteration, batch in enumerate(dataloader):
+                patches = batch['input'].float().to(device)
+                feats, classes = embedder(patches)
+                feats = feats.cpu().numpy()
+                feats_list.extend(feats)
+                batch_labels = batch['label']
+                feats_labels.extend(np.atleast_1d(batch_labels.squeeze().tolist()).tolist())
+                feats_positions.extend(batch['position'])
 
-    Args:
-        args (object): An object containing arguments or configurations for the data loader setup.
-        patches (List[str]): A list of file paths representing patches.
-        patch_labels_dict (dict): A dict in the form {patch_name: patch_label}
+                tqdm.write(
+                    '\r Computed: {}/{} -- {}/{}'.format(i + 1, num_bags, iteration + 1, len(dataloader)), end=''
+                )
 
-    Returns:
-        tuple: A tuple containing two elements:
-            - dataloader (torch.utils.data.DataLoader): The data loader to access the bag dataset in batches.
-            - dataset_size (int): The total number of bags (patches) in the dataset.
-    """
-    if args.backbone in specified_archs:
-        if args.transform == 1:
-            transforms = [Resize(224), ToTensor(), NormalizeImage((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))]
+        if len(feats_list) == 0:
+            print('No valid patch extracted from: ' + bags_list[i])
         else:
-            transforms = [Resize(224), ToTensor()]
-        transformed_dataset = BagDataset(
-            files_list=patches,
-            transform=Compose(transforms),
-            patch_labels_dict=patch_labels_dict
-        )
+            df = pd.DataFrame(feats_list, dtype=np.float32)
+            if args.dataset == 'camelyon16':
+                df['label'] = feats_labels if patch_labels_dict is not None else np.nan
+                df['position'] = feats_positions if patch_labels_dict is not None else None
+
+            split_name, class_name, bag_name = bags_list[i].split(os.path.sep)[-3:]
+            csv_directory = os.path.join(save_path, split_name, class_name)
+            csv_file = os.path.join(csv_directory, bag_name)
+            os.makedirs(csv_directory, exist_ok=True)
+            df_save_path = os.path.join(csv_file + '.csv')
+            df.to_csv(df_save_path, index=False, float_format='%.4f') 
+
+
+def get_bags_path(args):
+    '''
+    example: /project/hnguyen2/mvu9/camelyon16/single/single/normal/normal_122 
+    '''
+    bags_path = os.path.join(
+        DATASETS_PATH, args.dataset, 'single',
+        args.fold,
+        '*',  # train/test/val
+        '*',  # classes: 0_normal 1_tumor
+        '*',  # bag name
+    )
+
+    return bags_path 
+
+def get_patch_labels_dict(args) -> Optional[Dict[str, int]]:
+    patch_labels_path = os.path.join(DATASETS_PATH, args.dataset, 'tile_label.csv')
+
+    try:
+        labels_df = pd.read_csv(patch_labels_path)
+        print(f'Using patch_labels csv file at {patch_labels_path}')
+        duplicates = labels_df['slide_name'].duplicated()
+        assert not any(duplicates), "There are duplicate patch_names in the {patch_labels_csv} file."
+        return labels_df.set_index('slide_name')['label'].to_dict()
+
+    except FileNotFoundError:
+        print(f'No patch_labels csv file at {patch_labels_path}')
+        return None
+
+def main():
+    gpu_ids = tuple(args.gpu_index)
+    os.environ['CUDA_VISIBLE_DEVICES'] = ','.join(str(x) for x in gpu_ids)
+
+    backbone, num_feats = get_embedder_backbone(args)
+
+    #get bag  paths 
+    bags_path = get_bags_path(args)
+    print(f'Using bags at {bags_path}')
+    
+    #create 
+    if 'Supervised' in args.embedder:
+        feats_path = os.path.join(EMBEDDINGS_PATH, args.dataset, args.embedder)
     else:
-        transforms = [ToTensor()]
-        if args.backbone == 'vitbasetimm':
-            if args.transform == 1:
-                transforms = [Resize(224), ToTensor(), NormalizeImage((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))]
-            else:
-                transforms = [Resize(224), ToTensor()]
-        transformed_dataset = BagDataset(
-            files_list=patches,
-            transform=Compose(transforms),
-            patch_labels_dict=patch_labels_dict
-        )
-    dataloader = DataLoader(transformed_dataset, batch_size=args.batch_size, shuffle=False,
-                            num_workers=args.num_workers, drop_last=False)
-    return dataloader, len(transformed_dataset)
+        feats_path = os.path.join(EMBEDDINGS_PATH, args.dataset, args.embedder + "_" + args.version_name)
+
+    os.makedirs(feats_path, exist_ok=True)
+    
+    bags_list = glob.glob(bags_path)
+    
+    print(f'Number of bags: {len(bags_list)} | Sample Bag: {bags_list[0]}')
+
+    patch_labels_dict = get_patch_labels_dict(args)
+
+    start_time = time.time()
+    embedder, _ = get_embedder(args, backbone, num_feats)
+    compute_feats(args, bags_list, embedder, feats_path, patch_labels_dict)
+
+    print(f'Took {time.time() - start_time} seconds to compute feats')
+    save_class_features(args, feats_path)
+
+if __name__ == '__main__': 
+
+#TODO:
+# bag_path 
+# feature_path 
+# embedders 
+# compute feature by training 

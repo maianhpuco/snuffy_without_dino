@@ -7,7 +7,9 @@ import torch
 import torch.nn as nn
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
+sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
+ 
+from src.custom_layers import *
 
 class FCLayer(nn.Module):
     def __init__(self, in_size, out_size=1):
