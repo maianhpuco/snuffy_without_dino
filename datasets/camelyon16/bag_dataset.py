@@ -197,7 +197,7 @@ def compute_feats(
         
         with torch.no_grad():
             for iteration, batch in enumerate(dataloader):
-                patches = batch['input'].float().to(device)
+                patches = batch['input'].float().to(args.device)
                 feats, classes = embedder(patches)
                 feats = feats.cpu().numpy()
                 feats_list.extend(feats)
@@ -240,21 +240,17 @@ if __name__ == "__main__":
      
     args = parser.parse_args()
     args.slides_dir = config['SLIDES_DIR'] 
-    
     args.slides_dir = config['SLIDES_DIR']
     args.tile_label_csv = config['TILE_LABEL_CSV'] 
-    
     args.batch_size = 32 
     args.transform = 1 
     args.backbone = 'vitbasetimm' 
     args.num_workers = 1  
     args.gpu_index = [0] 
-     
-    gpu_ids = tuple(args.gpu_index)
-    
-    os.environ['CUDA_VISIBLE_DEVICES'] = ','.join(str(x) for x in gpu_ids)
+    args.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # Get backbone and feature size
+    gpu_ids = tuple(args.gpu_index)    
+    os.environ['CUDA_VISIBLE_DEVICES'] = ','.join(str(x) for x in gpu_ids)
     embedder = VITFeatureExtractor()
 
     # Get the path for bags (patches)
@@ -268,7 +264,7 @@ if __name__ == "__main__":
         print(f"Directory {feats_path} already existed and has been removed.")
     os.mkdir(feats_path)
        
-    bags_list = glob.glob(os.path.join(bags_path_normal, '*')) + glob.glob(os.path.join(bags_path_tumor,'*'))  
+    bags_list = glob.glob(os.path.join(bags_path_normal, '/*')) + glob.glob(os.path.join(bags_path_tumor,'/*'))  
     
     print(bags_list)
      
