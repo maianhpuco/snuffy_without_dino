@@ -419,7 +419,6 @@ if __name__ == '__main__':
             threshold=args.background_t,#0.5,
             tile_label_csv=args.tile_label_csv,
             slides_dir=args.slides_dir, 
-            **args
         ).run()
         
         nested_patches(
