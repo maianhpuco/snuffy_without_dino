@@ -416,7 +416,7 @@ if __name__ == '__main__':
             limit_bounds=True,
             quality=args.quality, #75,
             workers=args.workers, #8,
-            threshold=background_t,#0.5,
+            threshold=args.background_t,#0.5,
             tile_label_csv=args.tile_label_csv,
             slides_dir=args.slides_dir, 
             **kwargs
