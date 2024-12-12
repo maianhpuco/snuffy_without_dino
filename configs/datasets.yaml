@@ -1,3 +1,4 @@
 camelyon16:
-  folder_path: 
-  
+  folder_path: /project/hnguyen2/hqvo3/Datasets/digital_pathology/public/CAMELYON16
+  image_path: /project/hnguyen2/hqvo3/Datasets/digital_pathology/public/CAMELYON16/images 
+  split_csv_folder: ./dataset/camelyon16/splits

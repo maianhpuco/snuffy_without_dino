@@ -26,7 +26,7 @@ class TileWorker(Process):
     """A child process that generates and writes tiles."""
 
     def __init__(self, queue, slidepath, tile_size, overlap, limit_bounds,
-                 quality, threshold):
+                 quality, threshold, **kwargs):
         Process.__init__(self, name='TileWorker')
         self.daemon = True
         self._queue = queue
@@ -37,7 +37,13 @@ class TileWorker(Process):
         self._quality = quality
         self._threshold = threshold
         self._slide = None
-
+        self.tile_label_csv = tile_label_csv
+        self.slides_dir = slides_dir
+        
+        self.tile_label_csv = kwargs['tile_label_csv']
+        self.slides_dir = kwargs['slides_dir']
+     
+        
     def run(self):
         self._slide = open_slide(self._slidepath)
         last_associated = None
@@ -64,11 +70,18 @@ class TileWorker(Process):
 
                 (x, y), mlevel = dz.get_tile_coordinates(level, address)[0:2]
                 factor = 2 ** mlevel
-                annotation_file = 'datasets/camelyon16/annotations/' + c_slide.split('/')[-1].split('.')[0] + '.xml'
+                
+                annotation_file = os.path.join(
+                    self.slides_dir, 
+                    '/annotations/' + c_slide.split('/')[-1].split('.')[0] + '.xml'
                 label = 0
+                
                 if os.path.isfile(annotation_file):
-                    label = self.does_square_have_cancer(annotation_file, x, y, self._tile_size * factor)
-                tile_label_csv = open("datasets/camelyon16/tile_label.csv", "a")
+                    label = self.does_square_have_cancer(
+                        annotation_file, x, y, self._tile_size * factor)
+                    
+                tile_label_csv = open(self.tile_label_csv, "a")
+                
                 tile_label_csv.write(f'{c_slide}/{outfile},{label}\n')
 
                 if not (w == self._tile_size and h == self._tile_size):
@@ -160,9 +173,11 @@ class DeepZoomImageTiler(object):
 
 class DeepZoomStaticTiler(object):
     """Handles generation of tiles and metadata for all images in a slide."""
-
-    def __init__(self, slidepath, basename, mag_levels, base_mag, objective, format, tile_size, overlap,
-                 limit_bounds, quality, workers, threshold):
+    def __init__(self, slidepath=None, basename=None, mag_levels=None, base_mag=None, objective=None, 
+                 format=None, tile_size=None, overlap=None, limit_bounds=None, quality=None, 
+                 workers=None, threshold=None, tile_label_csv=None, **kwargs): 
+    # def __init__(self, slidepath, basename, mag_levels, base_mag, objective, format, tile_size, overlap,
+    #              limit_bounds, quality, workers, threshold, tile_label_csv):
         self._slide = open_slide(slidepath)
         self._basename = basename
         self._format = format
@@ -177,7 +192,7 @@ class DeepZoomStaticTiler(object):
         self._dzi_data = {}
         for _i in range(workers):
             TileWorker(self._queue, slidepath, tile_size, overlap,
-                       limit_bounds, quality, threshold).start()
+                       limit_bounds, quality, threshold, **kwargs).start()
 
     def run(self):
         self._run_image()
@@ -231,25 +246,28 @@ class DeepZoomStaticTiler(object):
         self._queue.join()
 
 
-def nested_patches(img_slide, out_base, level=(0,), ext='jpeg'):
+def nested_patches(img_slide=None, out_base=None, level=(0,), wsi_temp_folder=None, ext='jpeg'):
     print('\n Organizing patches')
     img_name = img_slide.split(os.sep)[-1].split('.')[0]
     img_class = img_slide.split(os.sep)[2]
-    n_levels = len(glob.glob('WSI_temp_files/*'))
+    n_levels = len(glob.glob(f'{wsi_temp_folder}/*'))
     bag_path = os.path.join(out_base, img_class, img_name)
     os.makedirs(bag_path, exist_ok=True)
+    
     if len(level) == 1:
-        patches = glob.glob(os.path.join('WSI_temp_files', '*', '*.' + ext))
+        patches = glob.glob(os.path.join(wsi_temp_folder, '*', '*.' + ext))
         for i, patch in enumerate(patches):
             patch_name = patch.split(os.sep)[-1]
             shutil.move(patch, os.path.join(bag_path, patch_name))
             sys.stdout.write('\r Patch [%d/%d]' % (i + 1, len(patches)))
         print('Done.')
+        
     else:
         level_factor = 2 ** int(level[1] - level[0])
-        levels = [int(os.path.basename(i)) for i in glob.glob(os.path.join('WSI_temp_files', '*'))]
+        levels = [int(os.path.basename(i)) for i in glob.glob(os.path.join(wsi_temp_folder, '*'))]
         levels.sort()
-        low_patches = glob.glob(os.path.join('WSI_temp_files', str(levels[0]), '*.' + ext))
+        low_patches = glob.glob(os.path.join(wsi_temp_folder, str(levels[0]), '*.' + ext))
+        
         for i, low_patch in enumerate(low_patches):
             low_patch_name = low_patch.split(os.sep)[-1]
             shutil.move(low_patch, os.path.join(bag_path, low_patch_name))
@@ -260,22 +278,31 @@ def nested_patches(img_slide, out_base, level=(0,), ext='jpeg'):
             low_y = int(low_patch_folder.split('_')[1])
             high_x_list = list(range(low_x * level_factor, (low_x + 1) * level_factor))
             high_y_list = list(range(low_y * level_factor, (low_y + 1) * level_factor))
+            
             for x_pos in high_x_list:
                 for y_pos in high_y_list:
                     high_patch = glob.glob(
-                        os.path.join('WSI_temp_files', str(levels[1]), '{}_{}.'.format(x_pos, y_pos) + ext))
+                        os.path.join(wsi_temp_folder, str(levels[1]), '{}_{}.'.format(x_pos, y_pos) + ext))
                     if len(high_patch) != 0:
                         high_patch = high_patch[0]
                         shutil.move(high_patch, os.path.join(bag_path, low_patch_folder, high_patch.split(os.sep)[-1]))
             os.rmdir(os.path.join(bag_path, low_patch_folder))
             os.remove(low_patch)
             sys.stdout.write('\r Patch [%d/%d]' % (i + 1, len(low_patches)))
+            
         print('Done.')
 
+def load_config(config_file):
+    with open(config_file, 'r') as file:
+        config = yaml.safe_load(file)
+    return config
 
 if __name__ == '__main__':
     Image.MAX_IMAGE_PIXELS = None
     parser = argparse.ArgumentParser(description='Patch extraction for camelyon16')
+    parser.add_argument(
+        '-c', '--config', type=str, default = 'deepzoom_tiler.yaml', require=True, help='Path to the config.yaml file'
+    ) 
     parser.add_argument(
         '-d', '--dataset', type=str,
         default='camelyon16',  # Changed to camelyon16
@@ -309,23 +336,74 @@ if __name__ == '__main__':
         '-t', '--background_t', type=int, default=20,
         help='Threshold for filtering background [15]'  # Changed to 20
     )
+    parser.add_argument("-d", "--tile_label_csv", type=str)
+    parser.add_argument("-d", "--wsi_temp_folder", type=str)
+    
     args = parser.parse_args()
 
+    config = load_config(args.config)
+    
+    args.slide_format = args.slide_format or config['SLIDE_FORMAT']
+    args.workers = args.workers or config['WORKERS']
+    args.quality = args.quality or config['QUALITY']
+    args.tile_size = args.tile_size or config['TILE_SIZE']
+    args.base_mag = args.base_mag or config['BASE_MAG']
+    args.objective = args.objective or config['OBJECTIVE']
+    args.background_t = args.background_t or config['BACKGROUND_T']
+    args.levels = args.levels or config['LEVELS']
+    args.dataset = args.dataset or config['DATASET']
+    args.format = args.format or config['FORMAT']
+    args.slides_dir = args.slides_dir or config['SLIDES_DIR']
+    args.output_dir = args.output_dir or config['OUTPUT_DIR']
+    args.tile_label_csv = args.tile_label_csv or config['TILE_LABEL_CSV'] 
+    args.wsi_temp_folder = args.args_temp_folder or config['WSI_TEMP_FOLDER']
+    
     levels = [1]
-    path_base = os.path.join('datasets', args.dataset)
-    out_base = os.path.join('datasets', args.dataset, 'single')
-    all_slides = glob.glob(os.path.join(path_base, '0_normal/*.' + args.slide_format)) + \
-                 glob.glob(os.path.join(path_base, '1_tumor/*.' + args.slide_format))
+    
+    print("image_dir: ", args.slides_dir)
+    out_base = os.path.join(args.output_dir, 'single')
+    all_slides = glob.glob(os.path.join(args.slides_dir, '0_normal/*.' + args.slide_format)) + \
+                 glob.glob(os.path.join(args.slides_dir, '1_tumor/*.' + args.slide_format))
 
     # pos-i_pos-j -> x, y
-    tile_label_csv = open("datasets/camelyon16/tile_label.csv", "a")
+    print(tile_label_csv)
+    tile_label_csv = open(args.tile_label_csv, "a")
     tile_label_csv.write('slide_name,label\n')
     tile_label_csv.close()
+    
+    temp_dir = args.wsi_temp_folder
+    if os.path.exists(temp_dir):
+        shutil.rmtree(temp_dir)
+        print(f"Directory {temp_dir} already existed and has been removed.")
+ 
     for idx, c_slide in enumerate(all_slides):
         print('Process slide {}/{} : {}'.format(idx + 1, len(all_slides), c_slide))
-        DeepZoomStaticTiler(c_slide, 'WSI_temp', levels, args.base_mag, args.objective, args.format, args.tile_size,
-                            args.overlap, True, args.quality, args.workers, args.background_t).run()
-        nested_patches(c_slide, out_base, levels, ext=args.format)
-        shutil.rmtree('WSI_temp_files')
+        tiler = DeepZoomStaticTiler(
+            slidepath=c_slide,
+            basename="WSI_temp",
+            mag_levels=levels,
+            base_mag=args.base_mag,
+            objective=arg.objective,
+            format=format ,
+            tile_size=tile_size, #256,
+            overlap=overlap,
+            limit_bounds=True,
+            quality=args.quality, #75,
+            workers=args.workers, #8,
+            threshold=background_t,#0.5,
+            tile_label_csv=args.tile_label_csv,
+            slides_dir=args.slides_dir, 
+            **kwargs
+        ).run()
+        
+        nested_patches(
+            img_slide=c_slide, 
+            out_base=out_base, 
+            levels=levels, 
+            wsi_temp_folder=wsi_temp_folder, 
+            ext=args.format)
+        
+        shutil.rmtree(temp_dir)
+        
     tile_label_csv.close()
     print('Patch extraction done for {} slides.'.format(len(all_slides)))

@@ -1,0 +1,15 @@
+# config.yaml
+SLIDE_FORMAT: tif
+WORKERS: 8
+QUALITY: 75
+TILE_SIZE: 256
+BASE_MAG: 20
+OBJECTIVE: 20
+BACKGROUND_T: 20
+LEVELS: 1
+DATASET: camelyon16
+FORMAT: jpeg
+SLIDES_DIR: /project/hnguyen2/hqvo3/Datasets/digital_pathology/public/CAMELYON16/images
+OUTPUT_DIR: /project/hnguyen2/mvu9/camelyon16/single
+TILE_LABEL_CSV: /project/hnguyen2/mvu9/camelyon16/tile_label.csv
+WSI_TEMP_FOLDER: /project/hnguyen2/mvu9/camelyon16/WSI_temp_files
