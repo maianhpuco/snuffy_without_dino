@@ -253,12 +253,16 @@ class DeepZoomStaticTiler(object):
         self._queue.join()
 
 
-def nested_patches(img_slide=None, out_base=None, level=(0,), wsi_temp_folder=None, ext='jpeg'):
+def nested_patches(img_slide=None,out_base=None, level=(0,), wsi_temp_folder=None, ext='jpeg'):
     print('\n Organizing patches')
     img_name = img_slide.split(os.sep)[-1].split('.')[0]
-    img_class = img_slide.split(os.sep)[2]
+    img_class = img_slide.split(os.sep)[-1].split(".")[0].split('_'[0])
+    print(f">>>>> Image Name {img_name}, Image Class {img_class}")
+    
     n_levels = len(glob.glob(f'{wsi_temp_folder}/*'))
     bag_path = os.path.join(out_base, img_class, img_name)
+    print("bag_path", bag_path)
+    
     os.makedirs(bag_path, exist_ok=True)
     
     if len(level) == 1:
