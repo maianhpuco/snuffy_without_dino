@@ -268,11 +268,11 @@ if __name__ == "__main__":
         print(f"Directory {feats_path} already existed and has been removed.")
     os.mkdir(feats_path)
        
-    bags_list = glob.glob(os.path.join(bags_path_normal)) + glob.glob(os.path.join(bags_path_tumor))  
+    bags_list = glob.glob(os.path.join(bags_path_normal, '/*')) + glob.glob(os.path.join(bags_path_tumor,'/*'))  
     
     print(bags_list)
      
-    print(f'Number of bags: {len(bags_list)} | Sample Bag: {bags_list[0]}')
+    print(f'>>>> Number of bags: {len(bags_list)} | Sample Bag: {bags_list[0]}')
 
     # Get patch labels (simulated here)
     patch_labels_dict = get_patch_labels_dict(args.tile_label_csv)
