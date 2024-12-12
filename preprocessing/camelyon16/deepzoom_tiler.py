@@ -376,14 +376,15 @@ if __name__ == '__main__':
         else:
             print("Can't find sample files")
         df = pd.read_csv(sampling_csv_filepath)
-        print(df)
         all_basenames = (
             df['train'].dropna().to_list() +
             df['val'].dropna().to_list() +
             df['test'].dropna().to_list()
         )
         all_slide_names = [f"{bn}.{args.format}" for bn in all_basenames if bn.split("_") in ['normal', 'tumor', 'test']]
+        print(all_slide_names) 
         all_slides = [glob.glob(os.path.join(args.slides_dir, i))[0] for i in all_slide_names]
+        print(all_slides)
     else: 
         print("RUNING ON FULL DATASET")
         all_slides = glob.glob(os.path.join(args.slides_dir, '*.' + args.slide_format)) 
