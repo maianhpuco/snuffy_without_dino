@@ -74,6 +74,7 @@ class TileWorker(Process):
                 annotation_file = os.path.join(
                     self.slides_dir, 
                     '/annotations/' + c_slide.split('/')[-1].split('.')[0] + '.xml'
+                )
                 label = 0
                 
                 if os.path.isfile(annotation_file):
