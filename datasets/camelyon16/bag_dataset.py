@@ -166,7 +166,7 @@ def bag_dataset(args, patches: List[str] = None, patch_labels_dict: dict = None)
     transformed_dataset = BagDataset(
         files_list=patches,
         transform=Compose(transforms),
-        patch_labels_dict=patch_labels_dict
+        patch_labels_dict=patch_labels_dict)
             
     dataloader = DataLoader(
         transformed_dataset, 
