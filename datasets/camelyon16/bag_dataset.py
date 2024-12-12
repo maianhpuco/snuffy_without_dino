@@ -155,7 +155,7 @@ def bag_dataset(args, patches: List[str] = None, patch_labels_dict: dict = None)
     return dataloader, len(transformed_dataset)
 
 
-def get_patch_labels_dict(tile_label_csv) -> Optional[Dict[str, int]]:
+def get_patch_labels_dict(patch_labels_path) -> Optional[Dict[str, int]]:
     try:
         labels_df = pd.read_csv(patch_labels_path)
         print("- content of tile_label: ")
