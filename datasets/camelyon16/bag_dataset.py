@@ -60,8 +60,6 @@ class BagDataset:
             sample = self.transform(sample)
         return sample
     
-
-
 class Resize:
     def __init__(self, size):
         self.size = size
@@ -73,7 +71,6 @@ class Resize:
             **sample,
             'input': img
         }
-
 
 class NormalizeImage:
     def __init__(self, mean, std):
@@ -112,7 +109,7 @@ class Compose:
             img = t(img)
         return img
 
-# Define your VIT feature extractor
+
 class VITFeatureExtractor(nn.Module):
     def __init__(self, base_model='vit_base_patch16_224', out_dim=768, pretrained=True):
         super(VITFeatureExtractor, self).__init__()
@@ -126,34 +123,14 @@ class VITFeatureExtractor(nn.Module):
         self.l2 = nn.Linear(num_ftrs, out_dim)
         
     def forward(self, x):
-        # Extract features using the forward_features method of the ViT model
-        fts = self.model.forward_features(x)  # Returns feature embeddings
-        h = fts[:, 0, :]  # Extracts the [CLS] token's feature vector
+        fts = self.model.forward_features(x)  
+        h = fts[:, 0, :]  
         x = self.l1(h)
         x = torch.relu(x)
         x = self.l2(x)
         return h, x  
     
 def bag_dataset(args, patches: List[str] = None, patch_labels_dict: dict = None) -> Tuple[DataLoader, int]:
-
-    """
-    Create a bag dataset and its corresponding data loader.
-
-    This function creates a bag dataset from the provided list of patch file paths and prepares a data loader to access
-    the data in batches. The bag dataset is expected to contain bag-level data, where each bag is represented as a
-    collection of instances.
-
-    Args:
-        args (object): An object containing arguments or configurations for the data loader setup.
-        patches (List[str]): A list of file paths representing patches.
-        patch_labels_dict (dict): A dict in the form {patch_name: patch_label}
-
-    Returns:
-        tuple: A tuple containing two elements:
-            - dataloader (torch.utils.data.DataLoader): The data loader to access the bag dataset in batches.
-            - dataset_size (int): The total number of bags (patches) in the dataset.
-    """
-
     if args.transform == 1:
         transforms = [
             Resize(224), 
@@ -282,10 +259,9 @@ if __name__ == "__main__":
     embedder = VITFeatureExtractor()
 
     # Get the path for bags (patches)
-    bags_path = '/project/hnguyen2/mvu9/camelyon16/single/single/normal'
-    # patches = glob.glob(os.path.join(test_path, '*.jpeg'))
+    bags_path_normal = '/project/hnguyen2/mvu9/camelyon16/single/single/normal'
+    bags_path_tumor  = '/project/hnguyen2/mvu9/camelyon16/single/single/tumor' 
     
-
     feats_path = '/project/hnguyen2/mvu9/camelyon16/features/normal' 
     
     if os.path.exists(feats_path):
@@ -293,8 +269,10 @@ if __name__ == "__main__":
         print(f"Directory {feats_path} already existed and has been removed.")
     os.mkdir(feats_path)
        
-    bags_list = glob.glob(os.path.join(bags_path))
+    bags_list = glob.glob(os.path.join(bags_path_normal)) + glob.glob(os.path.join(bags_path_tumor))  
     
+    print(bags_list)
+     
     print(f'Number of bags: {len(bags_list)} | Sample Bag: {bags_list[0]}')
 
     # Get patch labels (simulated here)
