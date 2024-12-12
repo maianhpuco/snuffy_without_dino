@@ -160,7 +160,7 @@ def get_patch_labels_dict(patch_labels_path) -> Optional[Dict[str, int]]:
         labels_df = pd.read_csv(patch_labels_path)
         ignore_values = ['slide_name', 'label']
         labels_df = labels_df[~labels_df.isin(ignore_values).any(axis=1)]
-        duplicate_rows = df[df.duplicated()]
+        duplicate_rows = labels_df[labels_df.duplicated()]
 
         print(duplicate_rows)
         print("- content of tile_label: ")
