@@ -268,6 +268,6 @@ if __name__=='__main__':
     vit_extractor = VITFeatureExtractor()
 
     # Get the feature vector from the input tensor
-    features = vit_extractor(input_tensor)
+    cls_token, features = vit_extractor(input_tensor)
 
-    print("Feature shape:", features.shape)  
+    print("Feature shape:", cls_token.shape, features.shape)  
