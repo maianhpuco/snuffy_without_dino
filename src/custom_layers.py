@@ -233,9 +233,10 @@ class VITFeatureExtractor(nn.Module):
     def forward(self, x):
         # Extract features using the forward_features method of the ViT model
         fts = self.model.forward_features(x)  # Returns feature embeddings
+        print(fts.shape)
         h = fts[:, 0, :] #extracts the [CLS] token's feature vector from the output of the ViT model for each image in the batch. 
         # h = h.squeeze()  # Ensure no unnecessary dimensions
-
+        print(h.shape)
         # Apply projection head
         x = self.l1(h)
         x = F.relu(x)
