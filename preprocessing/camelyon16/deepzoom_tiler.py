@@ -256,7 +256,7 @@ class DeepZoomStaticTiler(object):
 def nested_patches(img_slide=None,out_base=None, level=(0,), wsi_temp_folder=None, ext='jpeg'):
     print('\n Organizing patches')
     img_name = img_slide.split(os.sep)[-1].split('.')[0]
-    img_class = img_slide.split(os.sep)[-1].split(".")[0].split('_'[0])
+    img_class = img_slide.split(os.sep)[-1].split(".")[0].split('_')[0]
     print(f">>>>> Image Name {img_name}, Image Class {img_class}")
     
     n_levels = len(glob.glob(f'{wsi_temp_folder}/*'))
@@ -414,23 +414,23 @@ if __name__ == '__main__':
         print('Process slide {}/{} : {}'.format(idx + 1, len(all_slides), c_slide))
         start_time = time.time()
         
-        tiler = DeepZoomStaticTiler(
-            slidepath=c_slide,
-            basename="WSI_temp",
-            mag_levels=levels,
-            base_mag=args.base_mag,
-            objective=args.objective,
-            format=args.format ,
-            tile_size=args.tile_size, #256,
-            overlap=args.overlap,
-            limit_bounds=True,
-            quality=args.quality, #75,
-            workers=args.workers, #8,
-            threshold=args.background_t,#0.5,
-            tile_label_csv=args.tile_label_csv,
-            slides_dir=args.slides_dir, 
-        ).run()
-        print(f"- Done tiling after {(time.time()-start_time)/60.0} mins")
+        # tiler = DeepZoomStaticTiler(
+        #     slidepath=c_slide,
+        #     basename="WSI_temp",
+        #     mag_levels=levels,
+        #     base_mag=args.base_mag,
+        #     objective=args.objective,
+        #     format=args.format ,
+        #     tile_size=args.tile_size, #256,
+        #     overlap=args.overlap,
+        #     limit_bounds=True,
+        #     quality=args.quality, #75,
+        #     workers=args.workers, #8,
+        #     threshold=args.background_t,#0.5,
+        #     tile_label_csv=args.tile_label_csv,
+        #     slides_dir=args.slides_dir, 
+        # ).run()
+        # print(f"- Done tiling after {(time.time()-start_time)/60.0} mins")
         
         nested_patches(
             img_slide=c_slide, 
