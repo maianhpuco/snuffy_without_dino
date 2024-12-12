@@ -162,7 +162,6 @@ def get_patch_labels_dict(patch_labels_path) -> Optional[Dict[str, int]]:
         labels_df = labels_df[~labels_df.isin(ignore_values).any(axis=1)]
         labels_df = labels_df.drop_duplicates()
         print("- content of tile_label: ")
-        print(labels_df.head(10))
         print(f'Using patch_labels csv file at {patch_labels_path}')
         duplicates = labels_df['slide_name'].duplicated()
         assert not any(duplicates), "There are duplicate patch_names in the {patch_labels_csv} file."
@@ -181,6 +180,7 @@ def compute_feats(
         csv_directory: str = None
 ): 
     num_bags = len(bags_list)
+     
     
     for i in tqdm(range(num_bags)):
         start_time = time.time()
@@ -193,6 +193,8 @@ def compute_feats(
         feats_list = []
         feats_labels = []
         feats_positions = []
+        
+        embedder = embedder.to(device)  
         embedder.eval()
         
         with torch.no_grad():
@@ -275,6 +277,7 @@ if __name__ == "__main__":
 
     start_time = time.time()
     csv_directory = '/project/hnguyen2/mvu9/camelyon16/features' 
+
     
     compute_feats(
         args, 
