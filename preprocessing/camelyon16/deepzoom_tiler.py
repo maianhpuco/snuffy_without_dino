@@ -371,7 +371,7 @@ if __name__ == '__main__':
     if args.sampling == 1:
         sampling_csv_filepath = config['SAMPLING_CSV']
         
-        if os.file.exists(sampling_csv_filepath):
+        if os.path.exists(sampling_csv_filepath):
             print(f"RUNNING ON SAMPLING DATGASET, CSV IS AT {sampling_csv_filepath}")
         else:
             print("Can't find sample files")
