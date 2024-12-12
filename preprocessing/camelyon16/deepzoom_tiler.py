@@ -352,7 +352,6 @@ if __name__ == '__main__':
     args.base_mag = args.base_mag or config['BASE_MAG']
     args.objective = args.objective or config['OBJECTIVE']
     args.background_t = args.background_t or config['BACKGROUND_T']
-    args.levels = args.levels or config['LEVELS']
     args.dataset = args.dataset or config['DATASET']
     args.format = args.format or config['FORMAT']
     args.slides_dir = args.slides_dir or config['SLIDES_DIR']
@@ -360,8 +359,7 @@ if __name__ == '__main__':
     args.tile_label_csv = args.tile_label_csv or config['TILE_LABEL_CSV'] 
     args.wsi_temp_folder = args.args_temp_folder or config['WSI_TEMP_FOLDER']
     
-    levels = [1]
-    
+    levels = [config['LEVELS']]
     print("image_dir: ", args.slides_dir)
     out_base = os.path.join(args.output_dir, 'single')
     all_slides = glob.glob(os.path.join(args.slides_dir, '0_normal/*.' + args.slide_format)) + \
