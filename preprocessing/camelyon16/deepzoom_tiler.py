@@ -12,6 +12,7 @@ from unicodedata import normalize
 
 import numpy as np
 import pandas as pd 
+import time 
 
 from PIL import Image, ImageFilter, ImageStat
 from shapely.geometry import Polygon
@@ -405,7 +406,10 @@ if __name__ == '__main__':
         print(f"Directory {temp_dir} created")
     
     for idx, c_slide in enumerate(all_slides):
+        
         print('Process slide {}/{} : {}'.format(idx + 1, len(all_slides), c_slide))
+        start_time = time.time()
+        
         tiler = DeepZoomStaticTiler(
             slidepath=c_slide,
             basename="WSI_temp",
@@ -422,14 +426,16 @@ if __name__ == '__main__':
             tile_label_csv=args.tile_label_csv,
             slides_dir=args.slides_dir, 
         ).run()
+        print(f"- Done tiling after {(time.time()-start_time)/60.0} mins")
         
         nested_patches(
             img_slide=c_slide, 
             out_base=out_base, 
             levels=levels, 
-            wsi_temp_folder=wsi_temp_folder, 
+            wsi_temp_folder=args.wsi_temp_folder, 
             ext=args.format)
-        
+        print(f"- Done nested after {(time.time()-start_time)/60.0} mins") 
+         
         shutil.rmtree(temp_dir)
         
     tile_label_csv.close()
