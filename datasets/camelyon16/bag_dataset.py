@@ -123,7 +123,8 @@ class VITFeatureExtractor(nn.Module):
         x = self.l2(x)
         return h, x  
     
-def bag_dataset(args, patches=None: List[str], patch_labels_dict=None : dict = None) -> Tuple[DataLoader, int]:
+def bag_dataset(args, patches: List[str] = None, patch_labels_dict: dict = None) -> Tuple[DataLoader, int]:
+
     """
     Create a bag dataset and its corresponding data loader.
 
