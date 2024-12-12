@@ -289,7 +289,7 @@ if __name__ == "__main__":
     embedder = VITFeatureExtractor()
 
     # Get the path for bags (patches)
-    bag_path = '/project/hnguyen2/mvu9/camelyon16/single/single/normal'
+    bags_path = '/project/hnguyen2/mvu9/camelyon16/single/single/normal'
     # patches = glob.glob(os.path.join(test_path, '*.jpeg'))
     
 
