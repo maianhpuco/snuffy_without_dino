@@ -194,7 +194,7 @@ def compute_feats(
         feats_labels = []
         feats_positions = []
         
-        embedder = embedder.to(device)  
+        embedder = embedder.to(args.device)  
         embedder.eval()
         
         with torch.no_grad():
