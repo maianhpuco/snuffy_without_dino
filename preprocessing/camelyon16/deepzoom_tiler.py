@@ -363,9 +363,9 @@ if __name__ == '__main__':
     
     print("image_dir: ", args.slides_dir)
     out_base = os.path.join(args.output_dir, 'single')
-    all_slides = glob.glob(os.path.join(args.slides_dir, '0_normal/*.' + args.slide_format)) + \
-                 glob.glob(os.path.join(args.slides_dir, '1_tumor/*.' + args.slide_format))
-
+    all_slides = glob.glob(os.path.join(args.slides_dir, '*.' + args.slide_format)) 
+    print("all_slides:", all_slides) 
+    
     # pos-i_pos-j -> x, y
     tile_label_csv = open(args.tile_label_csv, "a")
     tile_label_csv.write('slide_name,label\n')
@@ -378,7 +378,7 @@ if __name__ == '__main__':
     os.mkdir(temp_dir)
     if os.path.exists(temp_dir):
         print(f"Directory {temp_dir} created")
-    print("all_slides:", all_slides)
+    
     for idx, c_slide in enumerate(all_slides):
         print('Process slide {}/{} : {}'.format(idx + 1, len(all_slides), c_slide))
         tiler = DeepZoomStaticTiler(
