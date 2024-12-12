@@ -268,18 +268,15 @@ if __name__ == "__main__":
         shutil.rmtree(feats_path)
         print(f"Directory {feats_path} already existed and has been removed.")
     os.mkdir(feats_path)
-    train_val_test = 'train': 
-        
+    
+    train_val_test = 'train'     
     split_df = pd.read_csv(args.sampling_csv)
     train_bags_list = split_df[train_val_test].dropna().tolist()  
-    
-    
     available_bags_list = glob.glob(os.path.join(bags_path_normal, '*')) + glob.glob(os.path.join(bags_path_tumor,'*')) 
     available_bags_base_names = [os.path.basename(bag) for bag in available_bags_list]
  
     filtered_bags_list = [bag for bag, base_name in zip(available_bags_list, available_bags_base_names) 
-                    if base_name in train_bags_list]
-    
+                    if base_name in train_bags_list]   
     bags_list = filtered_bags_list
     print(bags_list)
      
