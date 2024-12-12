@@ -7,6 +7,7 @@ import torch
 import torch.nn as nn
 import timm 
 import torch.nn.functional as F
+
  
 class FCLayer(nn.Module):
     def __init__(self, in_size, out_size=1):
