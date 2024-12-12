@@ -160,9 +160,7 @@ def get_patch_labels_dict(patch_labels_path) -> Optional[Dict[str, int]]:
         labels_df = pd.read_csv(patch_labels_path)
         ignore_values = ['slide_name', 'label']
         labels_df = labels_df[~labels_df.isin(ignore_values).any(axis=1)]
-        duplicate_rows = labels_df[labels_df.duplicated()]
-
-        print(duplicate_rows)
+        labels_df = labels_df.drop_duplicates()
         print("- content of tile_label: ")
         print(labels_df.head(10))
         print(f'Using patch_labels csv file at {patch_labels_path}')
@@ -268,7 +266,7 @@ if __name__ == "__main__":
        
     bags_list = glob.glob(os.path.join(bags_path_normal, '*')) + glob.glob(os.path.join(bags_path_tumor,'*'))  
     
-    print(bags_list)
+    # print(bags_list)
      
     print(f'>>>> Number of bags: {len(bags_list)} | Sample Bag: {bags_list[0]}')
 
