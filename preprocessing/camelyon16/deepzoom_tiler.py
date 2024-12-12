@@ -302,7 +302,7 @@ if __name__ == '__main__':
     Image.MAX_IMAGE_PIXELS = None
     parser = argparse.ArgumentParser(description='Patch extraction for camelyon16')
     parser.add_argument(
-        '-c', '--config', type=str, default = 'deepzoom_tiler.yaml', require=True, help='Path to the config.yaml file'
+        '-c', '--config', type=str, default = './configs/deepzoom_tiler.yaml', help='Path to the config.yaml file'
     ) 
     parser.add_argument(
         '-d', '--dataset', type=str,
