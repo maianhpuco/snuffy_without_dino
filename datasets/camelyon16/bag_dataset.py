@@ -205,6 +205,7 @@ def get_patch_labels_dict(tile_label_csv) -> Optional[Dict[str, int]]:
         return None 
     
 def compute_feats(
+        args,
         bags_list: List[str] = None,
         embedder: nn.Module = None,
         save_path: str = None,
