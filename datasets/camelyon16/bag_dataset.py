@@ -171,7 +171,7 @@ def get_patch_labels_dict(patch_labels_path) -> Optional[Dict[str, int]]:
         print(f'No patch_labels csv file at {patch_labels_path}')
         return None 
     
-def compute_feats(
+def learning_feats(
         args,
         bags_list: List[str] = None,
         embedder: nn.Module = None,
@@ -201,8 +201,10 @@ def compute_feats(
             for iteration, batch in enumerate(dataloader):
                 patches = batch['input'].float().to(args.device)
                 feats, classes = embedder(patches)
+                
                 feats = feats.cpu().numpy()
                 feats_list.extend(feats)
+                
                 batch_labels = batch['label']
                 feats_labels.extend(np.atleast_1d(batch_labels.squeeze().tolist()).tolist())
                 feats_positions.extend(batch['position'])
@@ -250,7 +252,7 @@ if __name__ == "__main__":
     args.num_workers = 1  
     args.gpu_index = [0] 
     args.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
+    args.dataset = 'camelyon16'
     gpu_ids = tuple(args.gpu_index)    
     os.environ['CUDA_VISIBLE_DEVICES'] = ','.join(str(x) for x in gpu_ids)
     embedder = VITFeatureExtractor()
@@ -267,7 +269,7 @@ if __name__ == "__main__":
     os.mkdir(feats_path)
        
     bags_list = glob.glob(os.path.join(bags_path_normal, '*')) + glob.glob(os.path.join(bags_path_tumor,'*'))  
-    
+    bags_list = bags_list[:2] 
     # print(bags_list)
      
     print(f'>>>> Number of bags: {len(bags_list)} | Sample Bag: {bags_list[0]}')
@@ -279,7 +281,7 @@ if __name__ == "__main__":
     csv_directory = '/project/hnguyen2/mvu9/camelyon16/features' 
 
     
-    compute_feats(
+    learning_feats(
         args, 
         bags_list=bags_list, 
         embedder=embedder, 
@@ -288,8 +290,7 @@ if __name__ == "__main__":
 
     print(f'Took {time.time() - start_time} seconds to compute feats')
 
-    # Save the features (optional step)
-    # save_class_features(args, feats_path)
+
  
     
  
