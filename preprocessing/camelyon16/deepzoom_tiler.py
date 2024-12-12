@@ -153,9 +153,12 @@ class DeepZoomImageTiler(object):
             if not (level in target_levels):
                 continue
             tiledir = os.path.join("%s_files" % self._basename, str(mag_list[mag_idx]))
+            
             if not os.path.exists(tiledir):
                 os.makedirs(tiledir)
+            
             cols, rows = self._dz.level_tiles[level]
+            
             for row in range(rows):
                 for col in range(cols):
                     tilename = os.path.join(tiledir, '%d_%d-%d.%s' % (
