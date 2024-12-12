@@ -265,7 +265,9 @@ def load_config(config_file):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(parents=[get_args_parser()], add_help=False)
+    # parser = argparse.ArgumentParser(parents=[get_args_parser()], add_help=False)
+    parser = argparse.ArgumentParser(description='Patch extraction for camelyon16')  
+    
     args = parser.parse_args()
     args.slides_dir = config['SLIDES_DIR'] 
     
