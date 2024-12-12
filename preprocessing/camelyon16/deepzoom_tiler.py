@@ -367,7 +367,6 @@ if __name__ == '__main__':
                  glob.glob(os.path.join(args.slides_dir, '1_tumor/*.' + args.slide_format))
 
     # pos-i_pos-j -> x, y
-    print(tile_label_csv)
     tile_label_csv = open(args.tile_label_csv, "a")
     tile_label_csv.write('slide_name,label\n')
     tile_label_csv.close()
