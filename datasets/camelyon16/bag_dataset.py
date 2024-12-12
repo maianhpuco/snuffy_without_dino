@@ -20,7 +20,9 @@ from typing import Optional, Dict
 import glob 
  
 import pandas as pd 
-
+from tqdm import tqdm
+ 
+ 
 class BagDataset:
     def __init__(self, files_list: List[str], transform=None, patch_labels_dict: Dict[str, int] = None):
         if patch_labels_dict is None:
