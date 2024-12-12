@@ -215,7 +215,7 @@ class MILNet(nn.Module):
     
     
 class VITFeatureExtractor(nn.Module):
-    def __init__(self, base_model, out_dim):
+    def __init__(self, base_model='vit_base_patch16_224', out_dim=768, pretrained=True):
         super(ViTSimCLR, self).__init__()
         self.model = timm.create_model(base_model, pretrained=True, num_classes=0)
         
@@ -263,7 +263,7 @@ if __name__=='__main__':
     input_tensor = torch.randn(8, 3, 224, 224)  # Example with a batch size of 8
 
     # Create the ViT feature extractor
-    vit_extractor = VITFeatureExtractor(model_name='vit_base_patch16_224', pretrained=True)
+    vit_extractor = VITFeatureExtractor()
 
     # Get the feature vector from the input tensor
     features = vit_extractor(input_tensor)
