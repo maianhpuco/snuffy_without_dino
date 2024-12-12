@@ -13,3 +13,4 @@ SLIDES_DIR: /project/hnguyen2/hqvo3/Datasets/digital_pathology/public/CAMELYON16
 OUTPUT_DIR: /project/hnguyen2/mvu9/camelyon16/single
 TILE_LABEL_CSV: /project/hnguyen2/mvu9/camelyon16/tile_label.csv
 WSI_TEMP_FOLDER: /project/hnguyen2/mvu9/camelyon16/WSI_temp_files
+SAMPLING_CSV: ./datasets/camelyon16/sample_20.csv

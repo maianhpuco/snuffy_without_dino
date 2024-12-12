@@ -11,6 +11,8 @@ from multiprocessing import Process, JoinableQueue
 from unicodedata import normalize
 
 import numpy as np
+import pandas as pd 
+
 from PIL import Image, ImageFilter, ImageStat
 from shapely.geometry import Polygon
 
@@ -301,7 +303,9 @@ def load_config(config_file):
 
 if __name__ == '__main__':
     Image.MAX_IMAGE_PIXELS = None
-    parser = argparse.ArgumentParser(description='Patch extraction for camelyon16')
+    parser = argparse.ArgumentParser(description='Patch extraction for camelyon16') 
+    parser.add_argument('-sl','--sampling', type=int, default=1, help='Run on sampling dataset instead of full?') 
+    
     parser.add_argument(
         '-c', '--config', type=str, default = './configs/deepzoom_tiler.yaml', help='Path to the config.yaml file'
     ) 
@@ -344,7 +348,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     config = load_config(args.config)
-    
+     
     args.slide_format = args.slide_format or config['SLIDE_FORMAT']
     args.workers = args.workers or config['WORKERS']
     args.quality = args.quality or config['QUALITY']
@@ -359,11 +363,26 @@ if __name__ == '__main__':
     args.output_dir = config['OUTPUT_DIR']
     args.tile_label_csv = config['TILE_LABEL_CSV'] 
     args.wsi_temp_folder = config['WSI_TEMP_FOLDER']
+    
     levels = [config['LEVELS']]
     
     print("image_dir: ", args.slides_dir)
     out_base = os.path.join(args.output_dir, 'single')
-    all_slides = glob.glob(os.path.join(args.slides_dir, '*.' + args.slide_format)) 
+    if args.sampling == 1:
+        samling_csv_filepath = config['SAMPLING_CSV']
+        print(f"RUNNING ON SAMPLING DATGASET, CSV IS AT {samling_csv_filepath}")
+        df = pd.read_csv(sampling_csv_filepath)
+        all_basenames = (
+            df['train'].dropna().to_list() +
+            df['val'].dropna().to_list() +
+            df['test'].dropna().to_list()
+        )
+        all_slide_names = [f"{bn}.{args.format}" for bn in all_basenames if bn.split("_") in ['normal', 'tumor', 'test']]
+        all_slides = [glob.glob(os.path.join(args.slides_dir, i))[0] for i in all_slide_name]
+    else: 
+        print("RUNING ON FULL DATASET")
+        all_slides = glob.glob(os.path.join(args.slides_dir, '*.' + args.slide_format)) 
+        
     print("all_slides:", all_slides) 
     
     # pos-i_pos-j -> x, y
@@ -386,10 +405,10 @@ if __name__ == '__main__':
             basename="WSI_temp",
             mag_levels=levels,
             base_mag=args.base_mag,
-            objective=arg.objective,
-            format=format ,
-            tile_size=tile_size, #256,
-            overlap=overlap,
+            objective=args.objective,
+            format=argsformat ,
+            tile_size=args.tile_size, #256,
+            overlap=args.overlap,
             limit_bounds=True,
             quality=args.quality, #75,
             workers=args.workers, #8,
