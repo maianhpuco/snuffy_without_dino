@@ -29,7 +29,7 @@ class TileWorker(Process):
     """A child process that generates and writes tiles."""
 
     def __init__(self, queue, slidepath, tile_size, overlap, limit_bounds,
-                 quality, threshold, **kwargs):
+                 quality, threshold, tile_label_csv, slides_dir):
         Process.__init__(self, name='TileWorker')
         self.daemon = True
         self._queue = queue
@@ -43,8 +43,9 @@ class TileWorker(Process):
         self.tile_label_csv = tile_label_csv
         self.slides_dir = slides_dir
         
-        self.tile_label_csv = kwargs['tile_label_csv']
-        self.slides_dir = kwargs['slides_dir']
+        self.tile_label_csv = tile_label_csv
+        self.slides_dir = slides_dir
+
      
         
     def run(self):
@@ -179,7 +180,8 @@ class DeepZoomStaticTiler(object):
     """Handles generation of tiles and metadata for all images in a slide."""
     def __init__(self, slidepath=None, basename=None, mag_levels=None, base_mag=None, objective=None, 
                  format=None, tile_size=None, overlap=None, limit_bounds=None, quality=None, 
-                 workers=None, threshold=None, tile_label_csv=None, **kwargs): 
+                 workers=None, threshold=None, tile_label_csv=None, slides_dir=None): 
+
     # def __init__(self, slidepath, basename, mag_levels, base_mag, objective, format, tile_size, overlap,
     #              limit_bounds, quality, workers, threshold, tile_label_csv):
         self._slide = open_slide(slidepath)
@@ -196,7 +198,7 @@ class DeepZoomStaticTiler(object):
         self._dzi_data = {}
         for _i in range(workers):
             TileWorker(self._queue, slidepath, tile_size, overlap,
-                       limit_bounds, quality, threshold, **kwargs).start()
+                       limit_bounds, quality, threshold, tile_label_csv, slides_dir).start()
 
     def run(self):
         self._run_image()
