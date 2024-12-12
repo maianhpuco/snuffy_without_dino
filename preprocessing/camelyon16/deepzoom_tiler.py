@@ -375,7 +375,10 @@ if __name__ == '__main__':
     if os.path.exists(temp_dir):
         shutil.rmtree(temp_dir)
         print(f"Directory {temp_dir} already existed and has been removed.")
- 
+    os.mkdir(temp_dir)
+    if os.path.exists(temp_dir):
+        print(f"Directory {temp_dir} created")
+
     for idx, c_slide in enumerate(all_slides):
         print('Process slide {}/{} : {}'.format(idx + 1, len(all_slides), c_slide))
         tiler = DeepZoomStaticTiler(
