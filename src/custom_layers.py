@@ -5,7 +5,7 @@ import math
 import numpy as np
 import torch
 import torch.nn as nn
-import timmm 
+import timm 
 
 class FCLayer(nn.Module):
     def __init__(self, in_size, out_size=1):
