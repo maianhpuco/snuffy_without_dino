@@ -285,7 +285,7 @@ if __name__ == "__main__":
     args.slides_dir = config['SLIDES_DIR'] 
     args.sampling_csv = config['SAMPLING_CSV']
     args.tile_label_csv = config['TILE_LABEL_CSV']  
-    args.batch_size = 
+    args.batch_size = 32
     args.transform = 1 
     args.num_workers = 1  
     args.gpu_index = [0] 
