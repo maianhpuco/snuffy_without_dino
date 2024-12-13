@@ -20,7 +20,6 @@ class Snuffy(nn.Module):
     def __init__(self, args):
         super(Snuffy, self).__init__()
         self.args = args
-        self.  # Instantiate the ViT feature extractor
         self.milnet = self._get_milnet()  # Get the MILNet for instance and bag classification
         self.criterion = nn.CrossEntropyLoss()
         self.optimizer = self._get_optimizer()
