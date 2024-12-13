@@ -210,7 +210,6 @@ class MILNet(nn.Module):
         self.b_classifier = b_classifier
 
     def forward(self, x):
-        x = feature_extractor(x)
         feats, classes = self.i_classifier(x)
         prediction_bag, A = self.b_classifier(feats, classes)
 
