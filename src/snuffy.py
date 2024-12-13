@@ -299,7 +299,6 @@ if __name__ == "__main__":
     args.dataset = 'camelyon16'
     gpu_ids = tuple(args.gpu_index)    
     os.environ['CUDA_VISIBLE_DEVICES'] = ','.join(str(x) for x in gpu_ids)
-    embedder = VITFeatureExtractor() 
     
     
     train_val_test = 'train'
