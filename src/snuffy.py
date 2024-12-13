@@ -20,7 +20,7 @@ class Snuffy(nn.Module):
     def __init__(self, args):
         super(Snuffy, self).__init__()
         self.args = args
-        self.vit_extractor = VITFeatureExtractor()  # Instantiate the ViT feature extractor
+        self.  # Instantiate the ViT feature extractor
         self.milnet = self._get_milnet()  # Get the MILNet for instance and bag classification
         self.criterion = nn.CrossEntropyLoss()
         self.optimizer = self._get_optimizer()
@@ -30,6 +30,7 @@ class Snuffy(nn.Module):
         """
         Creates the MILNet by combining the instance classifier and bag classifier.
         """
+        vit_extractor = VITFeatureExtractor()
         i_classifier = FCLayer(in_size=self.args.feats_size, out_size=self.args.num_classes).to(device)
         c = copy.deepcopy
         attn = MultiHeadedAttention(self.args.num_heads, self.args.feats_size).to(device)
@@ -52,7 +53,11 @@ class Snuffy(nn.Module):
             self.args.feats_size
         ).to(device)
 
-        milnet = MILNet(i_classifier, b_classifier).to(device)
+        milnet = MILNet(
+            vit_extractor, 
+            i_classifier, 
+            b_classifier
+            ).to(device)
 
         init_funcs_registry = {
             'trunc_normal': nn.init.trunc_normal_,
