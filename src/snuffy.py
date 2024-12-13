@@ -4,7 +4,6 @@ import copy
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import wandb
 from lightly.utils.scheduler import CosineWarmupScheduler
 from torch.autograd import Variable
 from typing import Optional
