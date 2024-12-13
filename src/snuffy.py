@@ -292,7 +292,6 @@ if __name__ == "__main__":
     args.tile_label_csv = config['TILE_LABEL_CSV']  
     args.batch_size = 32 
     args.transform = 1 
-    args.backbone = 'vitbasetimm' 
     args.num_workers = 1  
     args.gpu_index = [0] 
     args.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -320,7 +319,7 @@ if __name__ == "__main__":
 
         dataloader, bag_size = bag_dataset(args, patches, patch_labels_dict) 
         
-        feats_list = torch.empty(0, feats_size, dtype=torch.float32, device=feats.device)
+        feats_list = torch.empty(0, args.feats_size, dtype=torch.float32, device=feats.device)
         feats_labels = torch.empty(0, dtype=torch.float32, device=args.device)  # labels as tensor
         feats_positions = torch.empty(0, dtype=torch.float32, device=args.device) 
         
