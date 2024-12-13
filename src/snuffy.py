@@ -285,7 +285,7 @@ if __name__ == "__main__":
     args.slides_dir = config['SLIDES_DIR'] 
     args.sampling_csv = config['SAMPLING_CSV']
     args.tile_label_csv = config['TILE_LABEL_CSV']  
-    args.batch_size = 32
+    args.batch_size = 16
     args.transform = 1 
     args.num_workers = 1  
     args.gpu_index = [0] 
@@ -304,7 +304,7 @@ if __name__ == "__main__":
     csv_directory = '/project/hnguyen2/mvu9/camelyon16/features'  
     
     vit_extractor = vit_extractor.to(args.device)
-    model = model.to(args.device)
+    # model = model.to(args.device)
       
     for i in tqdm(range(num_bags)):
         start_time = time.time()
@@ -339,6 +339,7 @@ if __name__ == "__main__":
         print(feats_labels.shape)
         print(feats_positions.shape)
         break 
+        model = 
     
         # if self.args.l2normed_embeddings == 1:
         #     bag_feats = bag_feats / np.linalg.norm(bag_feats, axis=1, keepdims=True) 
