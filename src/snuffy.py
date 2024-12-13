@@ -31,8 +31,8 @@ from custom_layers import (
     VITFeatureExtractor, Encoder, EncoderLayer
 )
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src')) 
-sys.path.append(os.path.join(os.path.dirname(__file__), 'datasets', 'camelyon16'))
- 
+# sys.path.append(os.path.join(os.path.dirname(__file__), 'datasets', 'camelyon16'))
+sys.path.append('./datasets/camelyon16') 
 from bag_dataset import bag_dataset 
 
 
