@@ -197,7 +197,7 @@ if __name__ == "__main__":
         big_lambda = 0.5
         random_patch_share = 0.3
         depth = 4
-        weight_init__weight_init_i__weight_init_b = ['xavier_normal', 'xavier_normal']
+        weight_init__weight_init_i__weight_init_b = ['xavier_normal', 'xavier_normal', 'xavier_normal']
         single_weight_parameter = 0.5  # Set a value for single weight parameter
         scheduler = 'cosine'  # Specify the scheduler type
         lr = 0.0002  # Learning rate
