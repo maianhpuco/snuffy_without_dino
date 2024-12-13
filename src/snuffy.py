@@ -339,7 +339,6 @@ if __name__ == "__main__":
         print(feats_labels.shape)
         print(feats_positions.shape)
         break 
-        model = 
     
         # if self.args.l2normed_embeddings == 1:
         #     bag_feats = bag_feats / np.linalg.norm(bag_feats, axis=1, keepdims=True) 
