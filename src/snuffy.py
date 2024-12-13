@@ -214,10 +214,10 @@ def get_bag_list(train_val_test, args):
     
     feats_path = '/project/hnguyen2/mvu9/camelyon16/features/normal' 
     
-    if os.path.exists(feats_path):
-        shutil.rmtree(feats_path)
-        print(f"Directory {feats_path} already existed and has been removed.")
-    os.mkdir(feats_path)
+    # if os.path.exists(feats_path):
+    #     shutil.rmtree(feats_path)
+    #     print(f"Directory {feats_path} already existed and has been removed.")
+    # os.mkdir(feats_path)
 
     split_df = pd.read_csv(args.sampling_csv)
     train_bags_list = split_df[train_val_test].dropna().tolist()  
@@ -227,7 +227,9 @@ def get_bag_list(train_val_test, args):
     filtered_bags_list = [bag for bag, base_name in zip(available_bags_list, available_bags_base_names) 
                     if base_name in train_bags_list]   
     bags_list = filtered_bags_list 
-    return bag_list
+    
+    return bags_list
+
 # Example code to initialize and test
 if __name__ == "__main__":
     class Args:
