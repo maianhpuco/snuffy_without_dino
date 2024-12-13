@@ -23,9 +23,10 @@ class Snuffy(nn.Module):
         
         self.vit_extractor = VITFeatureExtractor(
             base_model='vit_base_patch16_224', out_dim=768, pretrained=True)
-        self.vit_extractor.to(args.device)
          
         self.milnet = self._get_milnet()  # Get the MILNet for instance and bag classification
+        self.vit_extractor.to(args.device)
+        self.milnet.to(args.device) 
         self.criterion = nn.CrossEntropyLoss()
         self.optimizer = self._get_optimizer()
         self.scheduler = self._get_scheduler()
@@ -225,7 +226,10 @@ if __name__ == "__main__":
     # Example input (batch of images)
     sample_input = torch.randn(16, 3, 224, 224)  # Batch of 16 images of size 224x224 with 3 channels
     sample_labels = torch.randint(0, 2, (16,))  # Random labels for binary classification
-
+    
+    sample_input = sample_input.to(args.device)  # Move input to the device (GPU or CPU)
+    sample_labels = sample_labels.to(args.device)  # Move labels to the device
+ 
     # Run model and get predictions
     ins_pred, bag_pred, attentions = model(sample_input)
 
