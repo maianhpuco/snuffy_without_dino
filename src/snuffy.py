@@ -334,6 +334,7 @@ if __name__ == "__main__":
             tqdm.write(
                 '\r Computed: {}/{} -- {}/{}'.format(i + 1, num_bags, iteration + 1, len(dataloader)), end=''
             )
+            print(feats.shape)
         print("-----check_shape")
         print(feats_list.shape)
         print(feats_labels.shape)
