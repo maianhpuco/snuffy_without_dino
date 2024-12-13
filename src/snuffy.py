@@ -205,6 +205,7 @@ if __name__ == "__main__":
         weight_decay = 5e-3
         num_epochs = 200
         eta_min = 1e-6
+        optimizer = 'adam'
 
     args = Args()
 
