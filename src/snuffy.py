@@ -194,7 +194,7 @@ class Snuffy(nn.Module):
         print(f"Model loaded from {model_path}")
         
         
-def get_bag_list(train_val_test):
+def get_bag_list(train_val_test, args):
     # Get the path for bags (patches)
     bags_path_normal = '/project/hnguyen2/mvu9/camelyon16/single/single/normal'
     bags_path_tumor  = '/project/hnguyen2/mvu9/camelyon16/single/single/tumor' 
@@ -205,7 +205,7 @@ def get_bag_list(train_val_test):
         shutil.rmtree(feats_path)
         print(f"Directory {feats_path} already existed and has been removed.")
     os.mkdir(feats_path)
-    
+
     split_df = pd.read_csv(args.sampling_csv)
     train_bags_list = split_df[train_val_test].dropna().tolist()  
     available_bags_list = glob.glob(os.path.join(bags_path_normal, '*')) + glob.glob(os.path.join(bags_path_tumor,'*')) 
@@ -238,6 +238,7 @@ if __name__ == "__main__":
         optimizer = 'adam'
         device = "cuda" if torch.cuda.is_available() else "cpu" 
         l2normed_embeddings = 1 
+        sampling_csv = './datasets/camelyon16/sample_20.csv'
         
     args = Args()
     
