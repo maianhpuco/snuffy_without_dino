@@ -13,7 +13,7 @@ from custom_layers import (
     VITFeatureExtractor, Encoder, EncoderLayer
 )
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
+# device = "cuda" if torch.cuda.is_available() else "cpu"
 
 
 class Snuffy(nn.Module):
@@ -23,7 +23,8 @@ class Snuffy(nn.Module):
         
         self.vit_extractor = VITFeatureExtractor(
             base_model='vit_base_patch16_224', out_dim=768, pretrained=True)
-        
+        self.vit_extractor.to(args.device)
+         
         self.milnet = self._get_milnet()  # Get the MILNet for instance and bag classification
         self.criterion = nn.CrossEntropyLoss()
         self.optimizer = self._get_optimizer()
@@ -34,11 +35,15 @@ class Snuffy(nn.Module):
         Creates the MILNet by combining the instance classifier and bag classifier.
         """
         
-        i_classifier = FCLayer(in_size=self.args.feats_size, out_size=self.args.num_classes).to(device)
+        i_classifier = FCLayer(
+            in_size=self.args.feats_size, out_size=self.args.num_classes
+            ).to(args.device)
         c = copy.deepcopy
-        attn = MultiHeadedAttention(self.args.num_heads, self.args.feats_size).to(device)
+        attn = MultiHeadedAttention(
+            self.args.num_heads, self.args.feats_size
+            ).to(args.device)
         ff = PositionwiseFeedForward(self.args.feats_size, self.args.feats_size * self.args.mlp_multiplier,
-                                     self.args.activation, self.args.encoder_dropout).to(device)
+                                     self.args.activation, self.args.encoder_dropout).to(args.device)
 
         b_classifier = BClassifier(
             Encoder(
@@ -54,12 +59,12 @@ class Snuffy(nn.Module):
             ),
             self.args.num_classes,
             self.args.feats_size
-        ).to(device)
+        ).to(args.device)
 
         milnet = MILNet(
             i_classifier, 
             b_classifier
-            ).to(device)
+            ).to(args.device)
 
         init_funcs_registry = {
             'trunc_normal': nn.init.trunc_normal_,
@@ -209,6 +214,7 @@ if __name__ == "__main__":
         num_epochs = 200
         eta_min = 1e-6
         optimizer = 'adam'
+        device = "cuda" if torch.cuda.is_available() else "cpu" 
 
     args = Args()
 
