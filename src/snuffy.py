@@ -234,11 +234,6 @@ def get_bag_list(train_val_test, args):
     bags_path_tumor  = '/project/hnguyen2/mvu9/camelyon16/single/single/tumor' 
     
     feats_path = '/project/hnguyen2/mvu9/camelyon16/features/normal' 
-    
-    # if os.path.exists(feats_path):
-    #     shutil.rmtree(feats_path)
-    #     print(f"Directory {feats_path} already existed and has been removed.")
-    # os.mkdir(feats_path)
 
     split_df = pd.read_csv(args.sampling_csv)
     train_bags_list = split_df[train_val_test].dropna().tolist()  
@@ -290,7 +285,7 @@ if __name__ == "__main__":
     args.slides_dir = config['SLIDES_DIR'] 
     args.sampling_csv = config['SAMPLING_CSV']
     args.tile_label_csv = config['TILE_LABEL_CSV']  
-    args.batch_size = 32 
+    args.batch_size = 
     args.transform = 1 
     args.num_workers = 1  
     args.gpu_index = [0] 
@@ -339,11 +334,6 @@ if __name__ == "__main__":
             tqdm.write(
                 '\r Computed: {}/{} -- {}/{}'.format(i + 1, num_bags, iteration + 1, len(dataloader)), end=''
             )
-            print("each epochs-----")
-            print(feats_list.shape)
-            print(feats_labels.shape)
-            print(feats_positions.shape)
-            
         print("-----check_shape")
         print(feats_list.shape)
         print(feats_labels.shape)
