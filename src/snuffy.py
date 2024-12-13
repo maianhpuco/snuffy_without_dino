@@ -248,7 +248,7 @@ if __name__ == "__main__":
     
     
     train_val_test = 'train'
-    bags_list = get_bag_list(train_val_test) 
+    bags_list = get_bag_list(train_val_test, args) 
     num_bags = len(bags_list)
     print(f'>>>> Running {train_val_test} | Number of bags: {len(bags_list)} | Sample Bag: {bags_list[0]}') 
     
