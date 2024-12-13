@@ -21,7 +21,7 @@ class Snuffy(nn.Module):
         super(Snuffy, self).__init__()
         self.args = args
         
-        self.vit_feature_extractor = VITFeatureExtractor(
+        self.vit_extractor = VITFeatureExtractor(
             base_model='vit_base_patch16_224', out_dim=768, pretrained=True)
         
         self.milnet = self._get_milnet()  # Get the MILNet for instance and bag classification
