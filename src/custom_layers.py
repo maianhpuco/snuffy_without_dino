@@ -217,42 +217,22 @@ class MILNet(nn.Module):
 
         return classes, prediction_bag, A
     
-    
 class VITFeatureExtractor(nn.Module):
     def __init__(self, base_model='vit_base_patch16_224', out_dim=768, pretrained=True):
         super(VITFeatureExtractor, self).__init__()
-        self.model = timm.create_model(base_model, pretrained=True, num_classes=0)
+        self.model = timm.create_model(base_model, pretrained=pretrained, num_classes=0)
         
-        num_ftrs = self.model.embed_dim 
+        num_ftrs = self.model.embed_dim
+        print("Feature size (num_ftrs):", num_ftrs)
         
-        # Projection MLP
+        # Projection MLP (optional)
         self.l1 = nn.Linear(num_ftrs, num_ftrs)
-        self.l2 = nn.Linear(num_ftrs, out_dim) 
-        
-
+        self.l2 = nn.Linear(num_ftrs, out_dim)
         
     def forward(self, x):
-        # Extract features using the forward_features method of the ViT model
-        fts = self.model.forward_features(x)  # Returns feature embeddings
-        # print(fts.shape)
-        h = fts[:, 0, :] #extracts the [CLS] token's feature vector from the output of the ViT model for each image in the batch. 
-        # h = h.squeeze()  # Ensure no unnecessary dimensions
-        # print(h.shape)
-        # Apply projection head
+        fts = self.model.forward_features(x)  
+        h = fts[:, 0, :]  
         x = self.l1(h)
-        x = F.relu(x)
+        x = torch.relu(x)
         x = self.l2(x)
-        return x  # cls token, feature embedding 
-
-    
-    
-# if __name__=='__main__':
-#     input_tensor = torch.randn(8, 3, 224, 224)  # Example with a batch size of 8
-
-#     # Create the ViT feature extractor
-#     vit_extractor = VITFeatureExtractor()
-
-#     # Get the feature vector from the input tensor
-#     features = vit_extractor(input_tensor)
-
-#     print("Feature shape:", features.shape)  
+        return h, x   

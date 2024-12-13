@@ -110,6 +110,25 @@ class Compose:
         return img
 
 
+class VITFeatureExtractor(nn.Module):
+    def __init__(self, base_model='vit_base_patch16_224', out_dim=768, pretrained=True):
+        super(VITFeatureExtractor, self).__init__()
+        self.model = timm.create_model(base_model, pretrained=pretrained, num_classes=0)
+        
+        num_ftrs = self.model.embed_dim
+        print("Feature size (num_ftrs):", num_ftrs)
+        
+        # Projection MLP (optional)
+        self.l1 = nn.Linear(num_ftrs, num_ftrs)
+        self.l2 = nn.Linear(num_ftrs, out_dim)
+        
+    def forward(self, x):
+        fts = self.model.forward_features(x)  
+        h = fts[:, 0, :]  
+        x = self.l1(h)
+        x = torch.relu(x)
+        x = self.l2(x)
+        return h, x  
     
 def bag_dataset(args, patches: List[str] = None, patch_labels_dict: dict = None) -> Tuple[DataLoader, int]:
     if args.transform == 1:
