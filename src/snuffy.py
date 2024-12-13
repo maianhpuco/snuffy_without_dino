@@ -290,7 +290,16 @@ if __name__ == "__main__":
     args.slides_dir = config['SLIDES_DIR'] 
     args.sampling_csv = config['SAMPLING_CSV']
     args.tile_label_csv = config['TILE_LABEL_CSV']  
-    
+    args.batch_size = 32 
+    args.transform = 1 
+    args.backbone = 'vitbasetimm' 
+    args.num_workers = 1  
+    args.gpu_index = [0] 
+    args.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    args.dataset = 'camelyon16'
+    gpu_ids = tuple(args.gpu_index)    
+    os.environ['CUDA_VISIBLE_DEVICES'] = ','.join(str(x) for x in gpu_ids)
+    embedder = VITFeatureExtractor() 
     
     
     train_val_test = 'train'
