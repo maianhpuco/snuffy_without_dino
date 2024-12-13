@@ -104,6 +104,8 @@ class EncoderLayer(nn.Module):
     def forward(self, x, c):
         "Follow Figure 1 (left) for connections."
         _, m_indices = torch.sort(c, 1, descending=True)
+        print(m_indices)
+        
         top_big_lambda_share_indices = m_indices[:, 0:math.ceil(self.big_lambda * self.top_big_lambda_share),
                                        :].squeeze()
         top_big_lambdas = torch.index_select(x, dim=1, index=top_big_lambda_share_indices)

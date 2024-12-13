@@ -13,9 +13,6 @@ from custom_layers import (
     VITFeatureExtractor, Encoder, EncoderLayer
 )
 
-# device = "cuda" if torch.cuda.is_available() else "cpu"
-
-
 class Snuffy(nn.Module):
     def __init__(self, args):
         super(Snuffy, self).__init__()
@@ -25,7 +22,6 @@ class Snuffy(nn.Module):
             base_model='vit_base_patch16_224', out_dim=768, pretrained=True)
          
         self.milnet = self._get_milnet()  # Get the MILNet for instance and bag classification
-        self.vit_extractor.to(args.device)
         self.milnet.to(args.device) 
         self.criterion = nn.CrossEntropyLoss()
         self.optimizer = self._get_optimizer()
@@ -91,7 +87,6 @@ class Snuffy(nn.Module):
         """
         Forward pass through the network.
         """
-        ins_feats, bag_feats = self.vit_extractor(x)  # Feature extraction using ViT
         ins_prediction, bag_prediction, attentions = self.milnet(bag_feats)
 
         return ins_prediction, bag_prediction, attentions
@@ -193,7 +188,29 @@ class Snuffy(nn.Module):
         """
         self.load_state_dict(torch.load(model_path))
         print(f"Model loaded from {model_path}")
-
+        
+        
+def get_bag_list(train_val_test):
+    # Get the path for bags (patches)
+    bags_path_normal = '/project/hnguyen2/mvu9/camelyon16/single/single/normal'
+    bags_path_tumor  = '/project/hnguyen2/mvu9/camelyon16/single/single/tumor' 
+    
+    feats_path = '/project/hnguyen2/mvu9/camelyon16/features/normal' 
+    
+    if os.path.exists(feats_path):
+        shutil.rmtree(feats_path)
+        print(f"Directory {feats_path} already existed and has been removed.")
+    os.mkdir(feats_path)
+    
+    split_df = pd.read_csv(args.sampling_csv)
+    train_bags_list = split_df[train_val_test].dropna().tolist()  
+    available_bags_list = glob.glob(os.path.join(bags_path_normal, '*')) + glob.glob(os.path.join(bags_path_tumor,'*')) 
+    available_bags_base_names = [os.path.basename(bag) for bag in available_bags_list]
+ 
+    filtered_bags_list = [bag for bag, base_name in zip(available_bags_list, available_bags_base_names) 
+                    if base_name in train_bags_list]   
+    bags_list = filtered_bags_list 
+    return bag_list
 # Example code to initialize and test
 if __name__ == "__main__":
     class Args:
@@ -216,23 +233,120 @@ if __name__ == "__main__":
         eta_min = 1e-6
         optimizer = 'adam'
         device = "cuda" if torch.cuda.is_available() else "cpu" 
-
+        l2normed_embeddings = 1 
+        
     args = Args()
-
-    # Initialize model
-    model = Snuffy(args)
     
-
-    # Example input (batch of images)
-    sample_input = torch.randn(50, 3, 224, 224)  # Batch of 16 images of size 224x224 with 3 channels
-    sample_labels = torch.randint(0, 2, (16,))  # Random labels for binary classification
+    vit_extractor = VITFeatureExtractor()
+    model = Snuffy(args) 
     
-    sample_input = sample_input.to(args.device)  # Move input to the device (GPU or CPU)
-    sample_labels = sample_labels.to(args.device)  # Move labels to the device
+    
+    
+    train_val_test = 'train'
+    bags_list = get_bag_list(train_val_test) 
+    num_bags = len(bags_list)
+    print(f'>>>> Running {train_val_test} | Number of bags: {len(bags_list)} | Sample Bag: {bags_list[0]}') 
+    
+    patch_labels_dict = get_patch_labels_dict(args.tile_label_csv) 
+    csv_directory = '/project/hnguyen2/mvu9/camelyon16/features'  
+    
+    vit_extractor = vit_extractor.to(args.device)
+    model = model.to(args.device)
+      
+    for i in tqdm(range(num_bags)):
+        start_time = time.time()
+        
+        patches = glob.glob(os.path.join(bags_list[i], '*.jpg')) + \
+                  glob.glob(os.path.join(bags_list[i], '*.jpeg'))
+
+        dataloader, bag_size = bag_dataset(args, patches, patch_labels_dict) 
+        
+        feats_list = torch.empty(0, feats_size, dtype=torch.float32, device=feats.device)
+        feats_labels = torch.empty(0, dtype=torch.float32, device=args.device)  # labels as tensor
+        feats_positions = torch.empty(0, dtype=torch.float32, device=args.device) 
+        
+        for iteration, batch in enumerate(dataloader):
+            patches = batch['input'].float().to(args.device)
+            _, feats = vit_extractor(patches)
+            
+            feats_list = torch.cat((feats_list, feats.cpu()), dim=0)
+            
+            feats_list.extend(feats)
+            batch_labels = batch['label']           
+            # feats_labels.extend(np.atleast_1d(batch_labels.squeeze().tolist()).tolist())
+            feats_labels = torch.cat((feats_labels, batch_labels.squeeze().float().to(args.device)), dim=0)
  
-    # Run model and get predictions
-    ins_pred, bag_pred, attentions = model(sample_input)
+            # feats_positions.extend(batch['position'])
+            feats_positions = torch.cat((feats_positions, batch['position'].float().to(args.device)), dim=0)
+            tqdm.write(
+                '\r Computed: {}/{} -- {}/{}'.format(i + 1, num_bags, iteration + 1, len(dataloader)), end=''
+            )
+            print("each epochs-----")
+            print(feats_list.shape)
+            print(feats_labels.shape)
+            print(feats_positions.shape)
+            
+        print("-----check_shape")
+        print(feats_list.shape)
+        print(feats_labels.shape)
+        print(feats_positions.shape)
+    
+        # if self.args.l2normed_embeddings == 1:
+        #     bag_feats = bag_feats / np.linalg.norm(bag_feats, axis=1, keepdims=True) 
+            
+        # bag_label = Variable(Tensor(np.array([bag_label])).to(device))
+        # bag_feats = Variable(Tensor(np.array([bag_feats])).to(device)) 
+        
 
-    # Example loss computation
-    loss = model.compute_loss(bag_pred, sample_labels, ins_pred)
-    print("Loss:", loss.item())
+
+# label, feats, feats_labels, positions 
+# def _load_data(bags_df, args):
+#     all_labels = []
+#     all_feats = []
+#     all_feats_labels = []
+#     all_positions = []
+#     all_slide_names = []
+
+#     feats_labels_available = True
+
+#     for i in tqdm(range(len(bags_df))):
+#         label, feats, feats_labels, positions = get_bag_feats(bags_df.iloc[i], args)
+#         all_labels.append(label)
+#         all_feats.append(feats)
+
+#         if feats_labels is None:
+#             feats_labels_available = False
+#         if feats_labels_available:
+#             all_feats_labels.append(feats_labels)
+#             all_positions.append(positions)
+#         all_slide_names.append(bags_df.iloc[i]['0'].split('/')[-1].split('.')[0])
+
+#     if not feats_labels_available:
+#         all_feats_labels = None
+#         all_positions = None
+
+#     return all_labels, all_feats, all_feats_labels, all_positions, all_slide_names
+ 
+ 
+# label, feats, feats_labels, positions = get_bag_feats(row, args)
+#     slide_name = row['0'].split('/')[-1].split('.')[0]
+#     return label, feats, feats_labels, positions, slide_name 
+
+
+    # # Initialize model
+    # 
+    
+
+    # # Example input (batch of images)
+    # sample_input = torch.randn(50, 3, 224, 224)  # Batch of 16 images of size 224x224 with 3 channels
+    # sample_labels = torch.randint(0, 2, (16,))  # Random labels for binary classification
+    
+    # sample_input = sample_input.to(args.device)  # Move input to the device (GPU or CPU)
+    # sample_labels = sample_labels.to(args.device)  # Move labels to the device
+ 
+    # # Run model and get predictions
+    # ins_pred, bag_pred, attentions = model(sample_input)
+
+    # # Example loss computation
+    # loss = model.compute_loss(bag_pred, sample_labels, ins_pred)
+    # print("Loss:", loss.item())
