@@ -245,8 +245,14 @@ def get_bag_list(train_val_test, args):
     
     return bags_list
 
+def load_config(config_file):
+    with open(config_file, 'r') as file:
+        config = yaml.safe_load(file)
+    return config
+ 
 # Example code to initialize and test
 if __name__ == "__main__":
+    config = load_config("./configs/compute_feats.yaml") 
     class Args:
         feats_size = 768
         num_classes = 2  # Example for binary classification
@@ -274,6 +280,10 @@ if __name__ == "__main__":
     
     vit_extractor = VITFeatureExtractor()
     model = Snuffy(args) 
+    
+    args.slides_dir = config['SLIDES_DIR'] 
+    args.sampling_csv = config['SAMPLING_CSV']
+    args.tile_label_csv = config['TILE_LABEL_CSV']  
     
     
     
