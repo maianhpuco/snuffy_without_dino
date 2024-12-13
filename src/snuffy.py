@@ -319,7 +319,7 @@ if __name__ == "__main__":
 
         dataloader, bag_size = bag_dataset(args, patches, patch_labels_dict) 
         
-        feats_list = torch.empty(0, args.feats_size, dtype=torch.float32, device=feats.device)
+        feats_list = torch.empty(0, args.feats_size, dtype=torch.float32, device=args.device)
         feats_labels = torch.empty(0, dtype=torch.float32, device=args.device)  # labels as tensor
         feats_positions = torch.empty(0, dtype=torch.float32, device=args.device) 
         
