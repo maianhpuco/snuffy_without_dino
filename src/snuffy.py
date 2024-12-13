@@ -326,16 +326,16 @@ if __name__ == "__main__":
         for iteration, batch in enumerate(dataloader):
             patches = batch['input'].float().to(args.device)
             _, feats = vit_extractor(patches)
-            
+            # Concatenate features to feats_list
             feats_list = torch.cat((feats_list, feats), dim=0)
-            
-            feats_list.extend(feats)
-            batch_labels = batch['label']           
-            # feats_labels.extend(np.atleast_1d(batch_labels.squeeze().tolist()).tolist())
-            feats_labels = torch.cat((feats_labels, batch_labels.squeeze().float()), dim=0)
- 
-            # feats_positions.extend(batch['position'])
-            feats_positions = torch.cat((feats_positions, batch['position'].float()), dim=0)
+
+            # Concatenate labels to feats_labels
+            batch_labels = batch['label']
+            feats_labels = torch.cat((feats_labels, batch_labels.squeeze().float().to(args.device)), dim=0)
+
+            # Concatenate positions to feats_positions
+            feats_positions = torch.cat((feats_positions, batch['position'].float().to(args.device)), dim=0)
+
             tqdm.write(
                 '\r Computed: {}/{} -- {}/{}'.format(i + 1, num_bags, iteration + 1, len(dataloader)), end=''
             )
