@@ -29,6 +29,11 @@ from custom_layers import (
     BClassifier, FCLayer, MILNet, 
     VITFeatureExtractor, Encoder, EncoderLayer
 )
+sys.path.append(os.path.join(os.path.dirname(__file__), 'src')) 
+sys.path.append(os.path.join(os.path.dirname(__file__), 'datasets'))
+ 
+from datasets.camelyon16.bag_dataset import bag_dataset 
+
 
 class Snuffy(nn.Module):
     def __init__(self, args):
