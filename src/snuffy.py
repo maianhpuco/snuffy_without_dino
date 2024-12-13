@@ -224,7 +224,7 @@ if __name__ == "__main__":
     
 
     # Example input (batch of images)
-    sample_input = torch.randn(16, 3, 224, 224)  # Batch of 16 images of size 224x224 with 3 channels
+    sample_input = torch.randn(50, 3, 224, 224)  # Batch of 16 images of size 224x224 with 3 channels
     sample_labels = torch.randint(0, 2, (16,))  # Random labels for binary classification
     
     sample_input = sample_input.to(args.device)  # Move input to the device (GPU or CPU)
