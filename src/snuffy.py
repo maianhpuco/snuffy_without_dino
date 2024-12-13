@@ -322,14 +322,14 @@ if __name__ == "__main__":
             patches = batch['input'].float().to(args.device)
             _, feats = vit_extractor(patches)
             # Concatenate features to feats_list
-            feats_list = torch.cat((feats_list, feats), dim=0)
+            # feats_list = torch.cat((feats_list, feats), dim=0)
 
             # Concatenate labels to feats_labels
             batch_labels = batch['label']
-            feats_labels = torch.cat((feats_labels, batch_labels.squeeze().float().to(args.device)), dim=0)
+            # feats_labels = torch.cat((feats_labels, batch_labels.squeeze().float().to(args.device)), dim=0)
 
             # Concatenate positions to feats_positions
-            feats_positions = torch.cat((feats_positions, batch['position'].float().to(args.device)), dim=0)
+            # feats_positions = torch.cat((feats_positions, batch['position'].float().to(args.device)), dim=0)
 
             tqdm.write(
                 '\r Computed: {}/{} -- {}/{}'.format(i + 1, num_bags, iteration + 1, len(dataloader)), end=''
