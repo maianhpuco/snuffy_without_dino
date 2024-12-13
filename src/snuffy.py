@@ -7,7 +7,7 @@ import torch.optim as optim
 from lightly.utils.scheduler import CosineWarmupScheduler
 from torch.autograd import Variable
 from typing import Optional
-from some_module import MultiHeadedAttention, PositionwiseFeedForward, BClassifier, FCLayer, MILNet
+from custom_layers import MultiHeadedAttention, PositionwiseFeedForward, BClassifier, FCLayer, MILNet
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
