@@ -7,5 +7,5 @@ __pycache__/
 
 env/  
 
-backup_folder/
-temp/
+_01_backup_folder/
+_02_temp/
